@@ -447,9 +447,15 @@
                 height: 100%;
                 display: grid;
                 grid-template-columns: 1fr 1fr;
-                grid-template-rows: repeat(3, 1fr);
+                grid-template-rows: repeat(2, 1fr);
                 background: var(--bg-color);
                 gap: 0;
+            }
+
+            /* Only 4 configured secondary channels are used. */
+            #grid-right .stream-card:nth-child(5),
+            #grid-right .stream-card:nth-child(6) {
+                display: none;
             }
 
             /* ========================================== STREAM CARD STYLES ========================================== */
@@ -2370,17 +2376,19 @@
             // The Cloudflare Worker fetches Athletiko server-side.
             // =============================================
             const ATHLETIKO_WORKER_URL = "https://athletiko-scraper.melissiamcr.workers.dev/";
-            const YOUTUBE_WAITING_WORKER_URL = ATHLETIKO_WORKER_URL;
 
 // =============================================
             // YOUTUBE DATA API v3
             // IMPORTANT: Restrict this API key in Google Cloud Console
             // by HTTP referrer and enable only YouTube Data API v3.
             // =============================================
-            const YOUTUBE_API_KEY = "AIzaSyCCDxpGMm9ttK8E2Rv2O475631mbWMlFGk";
+            const YOUTUBE_API_KEY = "AIzaSyCVt5Q2bvqZ_zhlWPGSbGABXg0KlmUuXhs";
             const YOUTUBE_API_BASE = "https://www.googleapis.com/youtube/v3";
             const YOUTUBE_API_TIMEOUT = 12000;
-            const YOUTUBE_STREAM_CACHE_MS = 60000;
+            // Stream discovery is cached for the lifetime of this page session.
+            // A full browser refresh starts a new session and discovers LIVE/UPCOMING again.
+            // Manual Refresh explicitly clears the session cache and discovers again.
+            const YOUTUBE_STREAM_CACHE_MS = 0; // Discovery is session-based: fresh on page load or explicit manual refresh.
 
             // =============================================
             // TICKER CODE
@@ -2638,8 +2646,8 @@
                     this.currentUnmutedSlot = null;
                     this.muteCheckInterval = null;
                     this.TARGET_QUALITY = "hd720";
-                    this.MIN_INTERVAL_MS = 4000;
-                    this.UPCOMING_WAITING_INTERVAL_MS = 12000;
+                    // videos.list is only 1 quota unit. Refresh live viewer counts every 48s.
+                    this.MIN_INTERVAL_MS = 48000;
                     this.FETCH_TIMEOUT = 12000;
                     this.STREAM_END_CONFIRM_COUNT = 2;
 
@@ -2669,14 +2677,6 @@
                             channelHandle: "@Foxbet_Gr",
                             channelName: "Foxbet.gr",
                         },
-                        5: {
-                            channelHandle: "@ProtoThemaEidiseis",
-                            channelName: "PROTOTHEMA.GR",
-                        },
-                        6: {
-                            channelHandle: "@monobalaGR",
-                            channelName: "MONOBALA",
-                        },
                         main: {
                             channelHandle: "@athletikogr",
                             channelName: "Athletiko",
@@ -2693,6 +2693,8 @@
                     this._loadSavedViewerCounts();
                     this.initLiveStreamDropdowns();
                     this.initYTApiCheck();
+                    // Some browsers can finish the YouTube IFrame API after the initial
+                    // discovery completes; onYTApiReady() will create any queued players.
                     this._startBadgeProtection();
                 }
 
@@ -2900,53 +2902,66 @@
                 async _fetchAllStreamsForChannel(cfg) {
                     if (!cfg?.channelHandle) return { live: [], upcoming: [] };
 
-                    const cacheKey = cfg.channelHandle;
+                    const cacheKey = cfg.channelHandle.toLowerCase();
                     const now = Date.now();
 
-                    if (
-                        this.cacheTimestamps[cacheKey] &&
-                        now - this.cacheTimestamps[cacheKey] < YOUTUBE_STREAM_CACHE_MS
-                    ) {
-                        return this.liveStreamsCache[cacheKey] || { live: [], upcoming: [] };
+                    // Discovery is intentionally session-based. Once a channel has been
+                    // discovered during this page session, reuse the result. A browser
+                    // refresh starts a new page session and therefore discovers again.
+                    if (this.liveStreamsCache[cacheKey]) {
+                        return this.liveStreamsCache[cacheKey];
                     }
 
-                    console.log(`🔄 Fetching ${cfg.channelName} from YouTube Data API...`);
+                    console.log(`🔄 Fetching LIVE + UPCOMING for ${cfg.channelName} from YouTube Data API...`);
 
                     try {
                         const channelId = await this._getChannelId(cfg);
                         if (!channelId) return { live: [], upcoming: [] };
 
-                        // Read the channel's uploads playlist instead of scraping YouTube HTML.
-                        // The latest 50 uploads are enough to locate the channel's current
-                        // live/upcoming broadcasts in normal operation.
-                        const channelData = await this._youtubeApiRequest("channels", {
-                            part: "contentDetails",
-                            id: channelId,
-                        });
+                        // IMPORTANT: Do not use the uploads playlist to discover scheduled
+                        // broadcasts. Scheduled streams are not reliably exposed there as
+                        // the channel's "latest uploads". Use YouTube's dedicated
+                        // search.list eventType filters instead.
+                        const [liveSearch, upcomingSearch] = await Promise.all([
+                            this._youtubeApiRequest("search", {
+                                part: "snippet",
+                                channelId,
+                                type: "video",
+                                eventType: "live",
+                                order: "date",
+                                maxResults: "50",
+                            }),
+                            this._youtubeApiRequest("search", {
+                                part: "snippet",
+                                channelId,
+                                type: "video",
+                                eventType: "upcoming",
+                                order: "date",
+                                maxResults: "50",
+                            }),
+                        ]);
 
-                        const uploadsPlaylistId =
-                            channelData?.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
-
-                        if (!uploadsPlaylistId) {
-                            throw new Error(`Uploads playlist not found for ${cfg.channelName}`);
-                        }
-
-                        const playlistData = await this._youtubeApiRequest("playlistItems", {
-                            part: "contentDetails",
-                            playlistId: uploadsPlaylistId,
-                            maxResults: "50",
-                        });
-
-                        const ids = (playlistData?.items || [])
-                            .map((item) => item?.contentDetails?.videoId)
+                        const liveIds = (liveSearch?.items || [])
+                            .map((item) => item?.id?.videoId)
                             .filter((id) => /^[A-Za-z0-9_-]{11}$/.test(id));
 
+                        const upcomingIds = (upcomingSearch?.items || [])
+                            .map((item) => item?.id?.videoId)
+                            .filter((id) => /^[A-Za-z0-9_-]{11}$/.test(id));
+
+                        // Deduplicate in case YouTube returns the same video in both results.
+                        const ids = [...new Set([...liveIds, ...upcomingIds])];
+
                         if (!ids.length) {
-                            this.liveStreamsCache[cacheKey] = { live: [], upcoming: [] };
+                            const result = { live: [], upcoming: [] };
+                            this.liveStreamsCache[cacheKey] = result;
                             this.cacheTimestamps[cacheKey] = now;
-                            return { live: [], upcoming: [] };
+
+                            console.log(`📺 ${cfg.channelName}: 0 live, 0 upcoming`);
+                            return result;
                         }
 
+                        // videos.list accepts up to 50 IDs per request.
                         const videoData = await this._youtubeApiRequest("videos", {
                             part: "snippet,liveStreamingDetails",
                             id: ids.join(","),
@@ -2993,8 +3008,10 @@
                             }
                         }
 
-                        // Live first; upcoming streams sorted by scheduled start time.
+                        // Live first by viewer count.
                         live.sort((a, b) => (Number(b.viewers) || 0) - (Number(a.viewers) || 0));
+
+                        // Upcoming strictly by scheduled start time.
                         upcoming.sort(
                             (a, b) =>
                                 (a.scheduledTimestamp || Number.MAX_SAFE_INTEGER) -
@@ -3192,6 +3209,11 @@
 
                 refreshModalDropdown() {
                     if (this.activeSlot) {
+                        const cfg = this.channelConfigs[this.activeSlot];
+                        if (cfg) {
+                            delete this.liveStreamsCache[cfg.channelHandle];
+                            delete this.cacheTimestamps[cfg.channelHandle];
+                        }
                         this.resetModalDropdown();
                         this.fetchModalLiveStreams(this.activeSlot);
                     }
@@ -3334,10 +3356,8 @@
                     if (this.highestMilestones) delete this.highestMilestones[slot];
                     this._saveViewerCounts();
 
-                    // Upcoming streams start with an empty badge. If YouTube exposes a
-                    // waiting/concurrent viewer count for the scheduled broadcast,
-                    // _fetchAndUpdate() will populate it; otherwise we leave it blank
-                    // rather than showing the previous stream's count.
+                    // Upcoming streams do not get a viewer-count badge because the
+                    // YouTube Data API does not expose concurrent viewers before LIVE.
                     if (streamMeta?.isUpcoming && !streamMeta?.viewers) {
                         if (bc) bc.innerHTML = `${this.userIconSVG}<span></span>`;
                     }
@@ -3366,9 +3386,9 @@
                     if (te) te.innerText = "Checking for next stream...";
 
                     try {
-                        delete this.liveStreamsCache[cfg.channelHandle];
-                        delete this.cacheTimestamps[cfg.channelHandle];
-
+                        // Do not bypass the discovery cache here. search.list costs 100 quota
+                        // units per request, so the Refresh button reuses the 10-minute cache.
+                        // The cache automatically refreshes once it expires.
                         const { live, upcoming } = await this._fetchAllStreamsForChannel(cfg);
                         const currentVidId = st.vidId;
 
@@ -3484,8 +3504,12 @@
                     if (dc) dc.textContent = cfg.channelName;
 
                     try {
-                        delete this.liveStreamsCache[cfg.channelHandle];
-                        delete this.cacheTimestamps[cfg.channelHandle];
+                        const cacheKey = cfg.channelHandle.toLowerCase();
+                        // This function is used by the manual refresh path and therefore
+                        // deliberately performs a fresh discovery.
+                        delete this.liveStreamsCache[cacheKey];
+                        delete this.liveStreamsCache[slot];
+                        delete this.cacheTimestamps[cacheKey];
 
                         const { live, upcoming } = await this._fetchAllStreamsForChannel(cfg);
                         this.liveStreamsCache[slot] = { live, upcoming };
@@ -3557,8 +3581,10 @@
                     if (!st?.realtimeActive) return;
                     if (st.timerId) clearTimeout(st.timerId);
 
-                    const baseInterval = st.isUpcoming ? this.UPCOMING_WAITING_INTERVAL_MS : this.MIN_INTERVAL_MS;
-                    const interval = Math.min(baseInterval * Math.pow(1.5, st.consecutiveFailures || 0), 30000);
+                    const interval = Math.min(
+                        this.MIN_INTERVAL_MS * Math.pow(1.5, st.consecutiveFailures || 0),
+                        120000
+                    );
 
                     st.timerId = setTimeout(async () => {
                         if (st.realtimeActive) {
@@ -3566,33 +3592,6 @@
                             this._scheduleNextFetch(slot);
                         }
                     }, interval);
-                }
-
-                async _fetchUpcomingWaitingCount(videoId) {
-                    if (!videoId) return null;
-
-                    try {
-                        const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), this.FETCH_TIMEOUT);
-                        const response = await fetch(
-                            `${YOUTUBE_WAITING_WORKER_URL}?youtube=${encodeURIComponent(videoId)}&_t=${Date.now()}`,
-                            {
-                                method: "GET",
-                                cache: "no-store",
-                                signal: controller.signal,
-                                headers: { Accept: "application/json" },
-                            }
-                        );
-                        clearTimeout(timeoutId);
-
-                        if (!response.ok) return null;
-                        const data = await response.json();
-                        const n = this._parseNumber(data?.waitingViewers);
-                        return n !== null && n >= 0 ? n : null;
-                    } catch (e) {
-                        console.warn("Upcoming waiting-count request failed:", e.message);
-                        return null;
-                    }
                 }
 
                 async _fetchAndUpdate(slot) {
@@ -3634,32 +3633,13 @@
                                 return;
                             }
                         } else if (isCurrentlyUpcoming) {
-                            // Stay on the closest upcoming stream. Do not advance through
-                            // the upcoming queue. Its waiting count is NOT provided by the
-                            // Data API, so retrieve that number through the Worker.
+                            // Keep the scheduled stream selected, but do not request any
+                            // separate upcoming/waiting viewer count. YouTube Data API does
+                            // not expose a concurrent viewer count for an upcoming broadcast.
                             st.isUpcoming = true;
                             st.notLiveCount = 0;
-
-                            const now = Date.now();
-                            if (!st.waitingFetchAt || now - st.waitingFetchAt >= this.UPCOMING_WAITING_INTERVAL_MS) {
-                                if (!st.waitingFetchInFlight) {
-                                    st.waitingFetchInFlight = true;
-                                    st.waitingFetchAt = now;
-
-                                    const waiting = await this._fetchUpcomingWaitingCount(st.vidId);
-                                    st.waitingFetchInFlight = false;
-
-                                    // Do not let an old count survive if the Worker cannot
-                                    // find a current waiting count.
-                                    if (waiting !== null) {
-                                        this._updateBadgeText(slot, this._formatNumber(waiting));
-                                    } else {
-                                        this._clearViewerBadge(slot);
-                                    }
-                                }
-                            }
-
                             st.consecutiveFailures = 0;
+                            this._clearViewerBadge(slot);
                             return;
                         }
 
@@ -3833,12 +3813,21 @@
                 }
 
                 initLiveStreamDropdowns() {
-                    Object.keys(this.channelConfigs).forEach((s) => this.fetchLiveStreams(s));
+                    // Fresh discovery on every full page load. Results are then kept in
+                    // memory for this session until the operator explicitly refreshes.
+                    Object.keys(this.channelConfigs).forEach((s) => this.fetchLiveStreams(s, true));
                 }
 
-                async fetchLiveStreams(slot) {
+                async fetchLiveStreams(slot, forceDiscovery = false) {
                     const cfg = this.channelConfigs[slot];
                     if (!cfg) return;
+
+                    if (forceDiscovery) {
+                        const cacheKey = cfg.channelHandle.toLowerCase();
+                        delete this.liveStreamsCache[cacheKey];
+                        delete this.liveStreamsCache[slot];
+                        delete this.cacheTimestamps[cacheKey];
+                    }
 
                     const dl = document.getElementById(`dropdown-list-${slot}`);
                     const dc = document.getElementById(`dropdown-channel-${slot}`);
@@ -3940,8 +3929,10 @@
                 refreshLiveStreams(slot) {
                     const cfg = this.channelConfigs[slot];
                     if (cfg) {
-                        delete this.liveStreamsCache[cfg.channelHandle];
-                        delete this.cacheTimestamps[cfg.channelHandle];
+                        const cacheKey = cfg.channelHandle.toLowerCase();
+                        delete this.liveStreamsCache[cacheKey];
+                        delete this.liveStreamsCache[slot];
+                        delete this.cacheTimestamps[cacheKey];
                     }
 
                     const wr = document.getElementById(`dropdown-wrapper-${slot}`);

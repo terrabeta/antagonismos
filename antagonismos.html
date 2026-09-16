@@ -1,0 +1,3999 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <title>WIDE_MCR_TOOLS</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            :root {
+                --bg-color: #bfbfbf;
+                --bg-secondary: #0d0d0d;
+                --panel-bg: rgba(28, 28, 30, 0.72);
+                --panel-border: rgba(255, 255, 255, 0.08);
+                --glass-bg: rgba(44, 44, 46, 0.65);
+                --glass-border: rgba(255, 255, 255, 0.1);
+                --accent-blue: #0a84ff;
+                --accent-green: #30d158;
+                --accent-red: #ff453a;
+                --accent-orange: #ff9f0a;
+                --accent-purple: #bf5af2;
+                --accent-pink: #ff375f;
+                --accent-teal: #64d2ff;
+                --accent-crawl: #00fc93;
+                --text-primary: #ffffff;
+                --text-secondary: rgba(255, 255, 255, 0.55);
+                --text-tertiary: rgba(255, 255, 255, 0.25);
+                --header-height: 56px;
+                --crawl-height: 65px;
+                --radius-sm: 8px;
+                --radius-md: 12px;
+                --radius-lg: 16px;
+                --radius-xl: 20px;
+                --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+                --shadow-md: 0 4px 24px rgba(0, 0, 0, 0.4);
+                --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.5);
+                --anim: 0.15s ease-in-out;
+                --anim-fast: 0.1s ease-in-out;
+                --anim-med: 0.2s ease-in-out;
+            }
+
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+                transition: all var(--anim);
+            }
+
+            html,
+            body {
+                height: 100%;
+                width: 100%;
+            }
+
+            body {
+                padding: 28px;
+                background: var(--bg-color);
+                background-image: radial-gradient(ellipse at top left, rgba(10, 132, 255, 0.08) 0%, transparent 50%),
+                    radial-gradient(ellipse at bottom right, rgba(191, 90, 242, 0.06) 0%, transparent 50%);
+                color: var(--text-primary);
+                font-family:
+                    "Inter",
+                    -apple-system,
+                    BlinkMacSystemFont,
+                    "SF Pro Display",
+                    "SF Pro Text",
+                    sans-serif;
+                height: 100vh;
+                width: 100vw;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            /* ========================================== NEWS TICKER STYLES ========================================== */
+            #news-ticker {
+                width: 100%;
+                height: var(--crawl-height);
+                background: linear-gradient(90deg, #111 0%, #0a0a0a 50%, #111 100%);
+                display: flex;
+                align-items: center;
+                overflow: hidden;
+                position: relative;
+                flex-shrink: 0;
+                z-index: 100;
+                border-top: 2px solid var(--accent-crawl);
+            }
+
+            /* ========================================== TICKER FLASH ANIMATION - SMOOTH BLINK ========================================== */
+            /* ========================================== TICKER FLASH ANIMATION - DOUBLE FADE BLINK ========================================== */
+            @keyframes tickerBlink {
+                0%,
+                100% {
+                    background: linear-gradient(90deg, #111 0%, #0a0a0a 50%, #111 100%);
+                }
+
+                25%,
+                75% {
+                    background: #00fc93;
+                }
+
+                50% {
+                    background: linear-gradient(90deg, #111 0%, #0a0a0a 50%, #111 100%);
+                }
+            }
+
+            @keyframes tickerTextBlink {
+                0%,
+                100% {
+                    color: #fff;
+                    text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+                }
+
+                25%,
+                75% {
+                    color: #000;
+                    text-shadow: none;
+                }
+
+                50% {
+                    color: #fff;
+                    text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+                }
+            }
+
+            @keyframes tickerIconBlink {
+                0%,
+                100% {
+                    background: rgba(0, 30, 18, 0.4);
+                }
+
+                25%,
+                75% {
+                    background: rgba(0, 252, 147, 0.8);
+                }
+
+                50% {
+                    background: rgba(0, 30, 18, 0.4);
+                }
+            }
+
+            @keyframes tickerLogoBlink {
+                0%,
+                100% {
+                    filter: drop-shadow(0 0 8px rgba(0, 252, 147, 0.6));
+                    transform: scale(1);
+                }
+
+                25%,
+                75% {
+                    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.9));
+                    transform: scale(1.05);
+                }
+
+                50% {
+                    filter: drop-shadow(0 0 8px rgba(0, 252, 147, 0.6));
+                    transform: scale(1);
+                }
+            }
+
+            #news-ticker.flash {
+                animation: tickerBlink 0.8s ease-in-out;
+            }
+
+            #news-ticker.flash .ticker-content .ticker-item {
+                animation: tickerTextBlink 0.8s ease-in-out !important;
+            }
+
+            #news-ticker.flash .ticker-icon {
+                animation: tickerIconBlink 0.8s ease-in-out;
+            }
+
+            #news-ticker.flash .ticker-icon .ticker-logo {
+                animation: tickerLogoBlink 0.8s ease-in-out;
+            }
+
+            .ticker-icon {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0 16px;
+                flex-shrink: 0;
+                height: 100%;
+                background: rgba(0, 30, 18, 0.4);
+                border-right: 2px solid #00fc93;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .ticker-icon .ticker-logo {
+                width: 53px;
+                height: 53px;
+                fill: var(--accent-crawl);
+                filter: drop-shadow(0 0 8px rgba(0, 252, 147, 0.6));
+                position: relative;
+                z-index: 2;
+            }
+
+            .ticker-icon .ticker-wave {
+                position: absolute;
+                width: 53px;
+                height: 53px;
+                z-index: 1;
+                pointer-events: none;
+                animation: svgPulse 8s ease-out infinite;
+            }
+
+            .ticker-icon .wave-1 {
+                animation-delay: 0s;
+            }
+
+            .ticker-icon .wave-2 {
+                animation-delay: -2s;
+            }
+
+            .ticker-icon .wave-3 {
+                animation-delay: -4s;
+            }
+
+            .ticker-icon .wave-4 {
+                animation-delay: -6s;
+            }
+
+            @keyframes svgPulse {
+                0% {
+                    transform: scale(1);
+                    opacity: 0.6;
+                    filter: blur(0px);
+                }
+
+                50% {
+                    opacity: 0.3;
+                    filter: blur(3px);
+                }
+
+                100% {
+                    transform: scale(6);
+                    opacity: 0;
+                    filter: blur(8px);
+                }
+            }
+
+            .ticker-content {
+                flex: 1;
+                overflow: hidden;
+                position: relative;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                padding: 0 20px;
+            }
+
+            .ticker-content::after {
+                content: "";
+                position: absolute;
+                right: 0;
+                top: 0;
+                width: 80px;
+                height: 100%;
+                background: linear-gradient(
+                    to left,
+                    rgba(10, 10, 10, 1) 0%,
+                    rgba(10, 10, 10, 0.9) 20%,
+                    rgba(10, 10, 10, 0.6) 40%,
+                    rgba(10, 10, 10, 0.3) 60%,
+                    rgba(10, 10, 10, 0.1) 80%,
+                    rgba(10, 10, 10, 0) 100%
+                );
+                z-index: 10;
+                pointer-events: none;
+                opacity: 0;
+                transition: opacity 0.2s ease;
+            }
+
+            .ticker-content.has-overflow::after {
+                opacity: 1;
+            }
+
+            a.ticker-item {
+                position: absolute;
+                white-space: nowrap;
+                font-size: 45px;
+                font-weight: 600;
+                color: #fff;
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+                opacity: 0;
+                transform: translateX(30px);
+                transition:
+                    opacity 0.25s ease,
+                    transform 0.25s ease;
+                display: flex;
+                align-items: center;
+                padding-right: 40px;
+                text-decoration: none;
+                cursor: pointer;
+                pointer-events: none;
+            }
+
+            a.ticker-item.active {
+                opacity: 1;
+                transform: translateX(0);
+                pointer-events: auto;
+            }
+
+            a.ticker-item.exiting {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+
+            a.ticker-item:hover {
+                color: var(--accent-crawl);
+            }
+
+            .ticker-loading {
+                font-size: 16px;
+                color: rgba(255, 255, 255, 0.5);
+                font-style: italic;
+            }
+
+            /* ========================================== MAIN LAYOUT STYLES ========================================== */
+            #main-container {
+                flex: 1;
+                display: flex;
+                overflow: hidden;
+            }
+
+            /* ========================================== LEFT SIDEBAR STYLES ========================================== */
+            #sidebar-left {
+                height: 100%;
+                width: 40%;
+                display: flex;
+                flex-direction: column;
+                background: var(--bg-secondary);
+                border-left: 2px solid #00fc93;
+                z-index: 10;
+                overflow: visible;
+            }
+
+            #main-player-group {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                background: var(--bg-secondary);
+                position: relative;
+                z-index: 60;
+                overflow: visible;
+            }
+
+            #main-video-frame {
+                width: 100%;
+                height: 233px;
+                position: relative;
+                background: #000;
+                overflow: visible;
+            }
+
+            /* ========================================== MAIN PLAYER DROPDOWN (Specific) ========================================== */
+            #main-video-frame .stream-dropdown-wrapper {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                min-height: 233px;
+                z-index: 100;
+                overflow: visible;
+            }
+
+            #main-video-frame .stream-dropdown {
+                z-index: 101;
+                position: relative;
+                overflow: visible;
+                background: rgba(30, 30, 30, 0.95);
+                border: 1px solid var(--glass-border);
+                border-radius: var(--radius-md);
+                transition:
+                    border-radius 0.2s ease,
+                    background 0.2s ease;
+            }
+
+            #main-video-frame .stream-dropdown.open {
+                border-radius: var(--radius-md) var(--radius-md) 0 0;
+                background: rgba(30, 30, 30, 0.98);
+            }
+
+            #main-video-frame .stream-dropdown .dropdown-header {
+                border-bottom: none;
+                border-radius: var(--radius-md);
+            }
+
+            #main-video-frame .stream-dropdown.open .dropdown-header {
+                border-bottom: 1px solid var(--glass-border);
+                border-radius: var(--radius-md) var(--radius-md) 0 0;
+            }
+
+            #main-video-frame .stream-dropdown .dropdown-list {
+                position: absolute;
+                top: 100%;
+                left: -1px;
+                right: -1px;
+                width: calc(100% + 2px);
+                background: rgba(30, 30, 30, 0.98);
+                max-height: 0;
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+                border: 1px solid var(--glass-border);
+                border-top: none;
+                border-radius: 0 0 var(--radius-md) var(--radius-md);
+                transition:
+                    opacity 0.2s ease,
+                    transform 0.2s ease,
+                    visibility 0.2s;
+                z-index: 102;
+            }
+
+            #main-video-frame .stream-dropdown.open .dropdown-list {
+                opacity: 1;
+                visibility: visible;
+                pointer-events: auto;
+                max-height: 70vh;
+                overflow-y: auto;
+                padding-bottom: 1px;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            }
+
+            #main-video-frame .stream-dropdown.open .dropdown-header {
+                border-radius: var(--radius-md) var(--radius-md) 0 0;
+            }
+
+            #chat-wrapper {
+                flex: 1;
+                background: var(--bg-secondary);
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+                z-index: 1;
+            }
+
+            #grid-right {
+                flex: 1;
+                height: 100%;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: repeat(3, 1fr);
+                background: var(--bg-color);
+                gap: 0;
+            }
+
+            /* ========================================== STREAM CARD STYLES ========================================== */
+            .stream-card {
+                background: var(--bg-secondary);
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+            }
+
+            .stream-card:hover {
+                z-index: 5;
+                background: #111;
+            }
+
+            .header-row {
+                display: flex;
+                width: 100%;
+                height: var(--header-height);
+                background: var(--glass-bg);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .header-row:hover {
+                background: rgba(60, 60, 62, 0.75);
+            }
+
+            .card-header {
+                height: 100%;
+                background: transparent;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                padding: 0 16px;
+                text-align: center;
+                flex: 1;
+                min-width: 0;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .card-header:hover {
+                background: rgba(255, 255, 255, 0.08);
+            }
+
+            .card-header:active {
+                background: rgba(255, 255, 255, 0.12);
+            }
+
+            .stream-title {
+                font-family:
+                    "Inter",
+                    -apple-system,
+                    BlinkMacSystemFont,
+                    sans-serif;
+                font-size: 30px;
+                font-weight: 600;
+                color: var(--text-secondary);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                flex: 1 1 auto;
+                text-align: center;
+                text-shadow: 0 0 0 transparent;
+            }
+
+            .card-header:hover .stream-title {
+                color: var(--text-primary);
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            }
+
+            /* ========================================== VIEWER BADGE STYLES ========================================== */
+            .viewer-badge {
+                height: 100%;
+                display: none;
+                align-items: center;
+                justify-content: flex-end;
+                padding: 0 16px;
+                flex-shrink: 0;
+                min-width: 140px;
+                box-shadow: inset 0 0 0 transparent;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .viewer-badge:hover {
+                filter: brightness(1.15);
+                box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.1);
+            }
+
+            .badge-main {
+                background: #ff0505;
+                color: #fff;
+            }
+
+            .badge-1,
+            .badge-2,
+            .badge-3,
+            .badge-4,
+            .badge-5,
+            .badge-6 {
+                background: #b8b8b8;
+                color: #1a1a1a;
+            }
+
+            .badge-content {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                gap: 8px;
+                font-size: 33px;
+                font-weight: 700;
+                letter-spacing: -0.2px;
+                font-variant-numeric: tabular-nums;
+                min-width: 100px;
+                text-align: right;
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            }
+
+            .badge-content span {
+                display: inline-block;
+                flex: 1;
+                text-align: right;
+            }
+
+            .badge-content svg {
+                width: 40px;
+                height: 40px;
+                fill: currentColor;
+                opacity: 0.9;
+                flex-shrink: 0;
+                filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+            }
+
+            /* ========================================== MILESTONE CELEBRATION ANIMATION ========================================== */
+            @keyframes milestoneFlash {
+                0% {
+                    background: #ff0505;
+                }
+
+                10% {
+                    background: #ffd700;
+                }
+
+                20% {
+                    background: #ff6b00;
+                }
+
+                30% {
+                    background: #fff;
+                }
+
+                40% {
+                    background: #ffd700;
+                }
+
+                50% {
+                    background: #ff6b00;
+                }
+
+                60% {
+                    background: #fff;
+                }
+
+                70% {
+                    background: #ffd700;
+                }
+
+                80% {
+                    background: #ff6b00;
+                }
+
+                90% {
+                    background: #ffd700;
+                }
+
+                100% {
+                    background: #ff0505;
+                }
+            }
+
+            @keyframes milestoneBurst {
+                0% {
+                    box-shadow:
+                        0 0 0 0 rgba(255, 215, 0, 0.8),
+                        0 0 0 0 rgba(255, 107, 0, 0.6),
+                        0 0 0 0 rgba(255, 255, 255, 0.4);
+                }
+
+                25% {
+                    box-shadow:
+                        0 0 20px 10px rgba(255, 215, 0, 0.8),
+                        0 0 40px 20px rgba(255, 107, 0, 0.6),
+                        0 0 60px 30px rgba(255, 255, 255, 0.3);
+                }
+
+                50% {
+                    box-shadow:
+                        0 0 30px 15px rgba(255, 255, 255, 0.9),
+                        0 0 60px 30px rgba(255, 215, 0, 0.7),
+                        0 0 90px 45px rgba(255, 107, 0, 0.4);
+                }
+
+                75% {
+                    box-shadow:
+                        0 0 15px 8px rgba(255, 215, 0, 0.6),
+                        0 0 30px 15px rgba(255, 107, 0, 0.4),
+                        0 0 45px 22px rgba(255, 255, 255, 0.2);
+                }
+
+                100% {
+                    box-shadow:
+                        0 0 0 0 rgba(255, 215, 0, 0),
+                        0 0 0 0 rgba(255, 107, 0, 0),
+                        0 0 0 0 rgba(255, 255, 255, 0);
+                }
+            }
+
+            @keyframes milestoneScale {
+                0% {
+                    transform: scale(1);
+                }
+
+                15% {
+                    transform: scale(1.12);
+                }
+
+                30% {
+                    transform: scale(0.95);
+                }
+
+                45% {
+                    transform: scale(1.08);
+                }
+
+                60% {
+                    transform: scale(0.98);
+                }
+
+                75% {
+                    transform: scale(1.04);
+                }
+
+                100% {
+                    transform: scale(1);
+                }
+            }
+
+            @keyframes milestoneTextFlash {
+                0%,
+                100% {
+                    color: #fff;
+                    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+                }
+
+                15%,
+                45%,
+                75% {
+                    color: #1a1a1a;
+                    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+                }
+
+                30%,
+                60% {
+                    color: #fff;
+                    text-shadow:
+                        0 0 10px rgba(255, 215, 0, 1),
+                        0 0 20px rgba(255, 215, 0, 0.8),
+                        0 0 30px rgba(255, 107, 0, 0.6);
+                }
+            }
+
+            @keyframes milestoneShine {
+                0% {
+                    left: -100%;
+                    opacity: 0;
+                }
+
+                20% {
+                    opacity: 1;
+                }
+
+                80% {
+                    opacity: 1;
+                }
+
+                100% {
+                    left: 200%;
+                    opacity: 0;
+                }
+            }
+
+            .badge-main.celebrating {
+                animation:
+                    milestoneFlash 1.5s ease-in-out,
+                    milestoneBurst 1.5s ease-out,
+                    milestoneScale 1s ease-in-out;
+                z-index: 100;
+            }
+
+            .badge-main.celebrating::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 50%;
+                height: 100%;
+                background: linear-gradient(
+                    90deg,
+                    transparent 0%,
+                    rgba(255, 255, 255, 0.2) 25%,
+                    rgba(255, 255, 255, 0.8) 50%,
+                    rgba(255, 255, 255, 0.2) 75%,
+                    transparent 100%
+                );
+                animation: milestoneShine 0.6s ease-out 0.2s;
+                pointer-events: none;
+            }
+
+            .badge-main.celebrating::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 50%;
+                height: 100%;
+                background: linear-gradient(
+                    90deg,
+                    transparent 0%,
+                    rgba(255, 255, 255, 0.2) 25%,
+                    rgba(255, 255, 255, 0.8) 50%,
+                    rgba(255, 255, 255, 0.2) 75%,
+                    transparent 100%
+                );
+                animation: milestoneShine 0.6s ease-out 0.5s;
+                pointer-events: none;
+            }
+
+            .badge-main.celebrating .badge-content {
+                animation: milestoneTextFlash 1.5s ease-in-out;
+            }
+
+            /* ========================================== CLOSE BUTTON STYLES ========================================== */
+            .close-btn {
+                height: 100%;
+                width: 48px;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                background: rgba(255, 255, 255, 0.06);
+                border: none;
+                color: var(--text-secondary);
+                font-size: 18px;
+                font-weight: 400;
+                cursor: pointer;
+                flex-shrink: 0;
+            }
+
+            .close-btn:hover {
+                background: var(--accent-red);
+                color: #fff;
+                box-shadow: 0 0 20px rgba(255, 69, 58, 0.4);
+            }
+
+            .close-btn:active {
+                opacity: 0.8;
+            }
+
+            .close-btn svg {
+                filter: drop-shadow(0 0 0 transparent);
+            }
+
+            .close-btn:hover svg {
+                transform: rotate(90deg);
+                filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+            }
+
+            /* ========================================== VIDEO CONTAINER STYLES ========================================== */
+            .video-container {
+                flex: 1;
+                position: relative;
+                background: #000;
+                overflow: hidden;
+            }
+
+            .stream-card:hover .video-container {
+                box-shadow: inset 0 0 50px rgba(255, 255, 255, 0.02);
+            }
+
+            .video-container iframe,
+            #main-video-frame iframe {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                border: none;
+            }
+
+            #chat-wrapper .video-container {
+                background: #0f0f0f;
+                overflow: hidden;
+            }
+
+            #chat-wrapper iframe {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 80%;
+                height: 80%;
+                transform: scale(1.25);
+                transform-origin: top left;
+                border: none;
+                background: #0f0f0f;
+            }
+
+            /* ========================================== PLACEHOLDER STYLES ========================================== */
+            .placeholder {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+                color: var(--text-tertiary);
+                gap: 8px;
+                cursor: pointer;
+            }
+
+            .placeholder:hover {
+                background: rgba(255, 255, 255, 0.02);
+            }
+
+            .placeholder:hover h1 {
+                opacity: 0.6;
+                text-shadow: 0 0 30px rgba(255, 255, 255, 0.15);
+            }
+
+            .placeholder:hover p {
+                opacity: 0.8;
+                color: var(--text-secondary);
+            }
+
+            .placeholder h1 {
+                font-size: 48px;
+                font-weight: 700;
+                opacity: 0.4;
+                letter-spacing: -1px;
+                text-shadow: 0 0 0 transparent;
+                pointer-events: none;
+            }
+
+            .placeholder p {
+                font-size: 13px;
+                font-weight: 500;
+                opacity: 0.5;
+                pointer-events: none;
+            }
+
+            #ph-chat {
+                cursor: default;
+                pointer-events: none;
+            }
+
+            /* ========================================== LIVE STREAMS DROPDOWN STYLES (GENERIC/TILES) ========================================== */
+            .stream-dropdown-wrapper {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+                background: rgba(0, 0, 0, 0.85);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                z-index: 50;
+                gap: 16px;
+                padding: 20px;
+            }
+
+            .stream-dropdown-wrapper.hidden {
+                display: none;
+            }
+
+            .dropdown-title {
+                font-size: 14px;
+                font-weight: 600;
+                color: var(--text-secondary);
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .dropdown-channel-name {
+                font-size: 18px;
+                font-weight: 700;
+                color: var(--text-primary);
+                margin-bottom: 8px;
+            }
+
+            .stream-dropdown {
+                width: 90%;
+                max-width: 400px;
+                display: flex;
+                flex-direction: column;
+                max-height: 85%;
+                background: rgba(30, 30, 30, 0.95);
+                border: 1px solid var(--glass-border);
+                border-radius: var(--radius-md);
+                overflow: hidden;
+                position: relative;
+            }
+
+            .dropdown-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 12px 16px;
+                background: rgba(255, 255, 255, 0.05);
+                cursor: pointer;
+                border-bottom: 1px solid var(--glass-border);
+                flex-shrink: 0;
+            }
+
+            .dropdown-header:hover {
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .dropdown-header-text {
+                font-size: 14px;
+                font-weight: 500;
+                color: var(--text-primary);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                flex: 1;
+            }
+
+            .dropdown-arrow {
+                width: 20px;
+                height: 20px;
+                fill: var(--text-secondary);
+                transition: transform 0.2s ease;
+                flex-shrink: 0;
+                margin-left: 10px;
+            }
+
+            .stream-dropdown.open .dropdown-arrow {
+                transform: rotate(180deg);
+            }
+
+            .dropdown-list {
+                max-height: 0;
+                overflow-y: auto;
+                transition: max-height 0.3s ease;
+            }
+
+            .stream-dropdown.open .dropdown-list {
+                max-height: 100%;
+                padding-bottom: 1px;
+            }
+
+            .dropdown-item {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 12px 16px;
+                cursor: pointer;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                transition: background 0.15s ease;
+            }
+
+            .dropdown-item:last-child {
+                border-bottom: none;
+            }
+
+            .dropdown-item:hover {
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .dropdown-item-live {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding: 3px 8px;
+                background: #ff0000;
+                border-radius: 4px;
+                font-size: 10px;
+                font-weight: 700;
+                color: #fff;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                flex-shrink: 0;
+            }
+
+            .dropdown-item-live::before {
+                content: "";
+                width: 6px;
+                height: 6px;
+                background: #fff;
+                border-radius: 50%;
+                animation: livePulse 1.5s ease-in-out infinite;
+            }
+
+            @keyframes livePulse {
+                0%,
+                100% {
+                    opacity: 1;
+                }
+
+                50% {
+                    opacity: 0.4;
+                }
+            }
+
+            .dropdown-item-upcoming {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding: 3px 8px;
+                background: #ff9f0a;
+                border-radius: 4px;
+                font-size: 10px;
+                font-weight: 700;
+                color: #000;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                flex-shrink: 0;
+            }
+
+            .dropdown-item-upcoming::before {
+                content: "";
+                width: 6px;
+                height: 6px;
+                background: #000;
+                border-radius: 50%;
+                opacity: 0.6;
+            }
+
+            .dropdown-item-time {
+                font-size: 11px;
+                font-weight: 600;
+                color: var(--accent-orange);
+                flex-shrink: 0;
+                padding: 2px 6px;
+                background: rgba(255, 159, 10, 0.15);
+                border-radius: 4px;
+            }
+
+            .dropdown-section-header {
+                padding: 10px 16px 6px;
+                font-size: 10px;
+                font-weight: 700;
+                color: var(--text-tertiary);
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                background: rgba(0, 0, 0, 0.3);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            .dropdown-item.upcoming-item {
+                background: rgba(255, 159, 10, 0.05);
+            }
+
+            .dropdown-item.upcoming-item:hover {
+                background: rgba(255, 159, 10, 0.15);
+            }
+
+            .dropdown-item-title {
+                font-size: 13px;
+                font-weight: 500;
+                color: var(--text-primary);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                flex: 1;
+            }
+
+            .dropdown-item-viewers {
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--text-secondary);
+                flex-shrink: 0;
+            }
+
+            .dropdown-loading {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                padding: 20px;
+                color: var(--text-secondary);
+                font-size: 13px;
+            }
+
+            .dropdown-loading-spinner {
+                width: 18px;
+                height: 18px;
+                border: 2px solid rgba(255, 255, 255, 0.2);
+                border-top-color: var(--accent-blue);
+                border-radius: 50%;
+                animation: spin 0.8s linear infinite;
+            }
+
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .dropdown-error {
+                padding: 20px;
+                text-align: center;
+                color: var(--text-secondary);
+                font-size: 13px;
+            }
+
+            .dropdown-error-retry {
+                color: var(--accent-blue);
+                cursor: pointer;
+                margin-top: 8px;
+                font-weight: 500;
+            }
+
+            .dropdown-error-retry:hover {
+                text-decoration: underline;
+            }
+
+            .dropdown-actions {
+                display: flex;
+                gap: 10px;
+                margin-top: 8px;
+            }
+
+            .dropdown-btn {
+                padding: 10px 20px;
+                font-size: 13px;
+                font-weight: 600;
+                border: none;
+                border-radius: var(--radius-sm);
+                cursor: pointer;
+                transition: all 0.15s ease;
+            }
+
+            .dropdown-btn-skip {
+                background: rgba(255, 255, 255, 0.1);
+                color: var(--text-secondary);
+            }
+
+            .dropdown-btn-skip:hover {
+                background: rgba(255, 255, 255, 0.2);
+                color: var(--text-primary);
+            }
+
+            .dropdown-btn-refresh {
+                background: rgba(10, 132, 255, 0.2);
+                color: var(--accent-blue);
+            }
+
+            .dropdown-btn-refresh:hover {
+                background: rgba(10, 132, 255, 0.3);
+            }
+
+            /* ========================================== MODAL STYLES ========================================== */
+            #modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0, 0, 0, 0.75);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                z-index: 9999;
+                display: none;
+                justify-content: center;
+                align-items: center;
+                opacity: 0;
+            }
+
+            #modal-overlay.active {
+                opacity: 1;
+            }
+
+            .modal-box {
+                background: var(--glass-bg);
+                backdrop-filter: blur(40px);
+                -webkit-backdrop-filter: blur(40px);
+                border: 1px solid var(--glass-border);
+                border-radius: var(--radius-xl);
+                width: 480px;
+                max-height: 90vh;
+                padding: 24px;
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+                box-shadow: var(--shadow-lg);
+                opacity: 0;
+                overflow-y: auto;
+            }
+
+            #modal-overlay.active .modal-box {
+                opacity: 1;
+            }
+
+            .modal-title {
+                color: var(--text-primary);
+                font-size: 17px;
+                font-weight: 600;
+                text-align: center;
+                padding-bottom: 8px;
+            }
+
+            .modal-slot-info {
+                text-align: center;
+                color: var(--text-secondary);
+                font-size: 13px;
+                margin-top: -12px;
+            }
+
+            .modal-divider {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                color: var(--text-tertiary);
+                font-size: 12px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .modal-divider::before,
+            .modal-divider::after {
+                content: "";
+                flex: 1;
+                height: 1px;
+                background: var(--glass-border);
+            }
+
+            .modal-section-title {
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--text-secondary);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 8px;
+            }
+
+            .modal-dropdown-wrapper {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .modal-dropdown {
+                width: 100%;
+                background: rgba(30, 30, 30, 0.95);
+                border: 1px solid var(--glass-border);
+                border-radius: var(--radius-md);
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .modal-dropdown .dropdown-header {
+                padding: 14px 16px;
+                flex-shrink: 0;
+            }
+
+            .modal-dropdown .dropdown-list {
+                max-height: 0;
+                overflow-y: hidden;
+                transition: max-height 0.25s ease;
+            }
+
+            .modal-dropdown.open .dropdown-list {
+                max-height: 250px;
+                overflow-y: auto;
+                padding-bottom: 30px;
+            }
+
+            .modal-input {
+                background: rgba(0, 0, 0, 0.3);
+                border: 1px solid var(--glass-border);
+                border-radius: var(--radius-md);
+                color: var(--text-primary);
+                padding: 14px 16px;
+                font-size: 15px;
+                font-family: inherit;
+                width: 100%;
+                outline: none;
+            }
+
+            .modal-input::placeholder {
+                color: var(--text-tertiary);
+            }
+
+            .modal-input:focus {
+                border-color: var(--accent-blue);
+                box-shadow:
+                    0 0 0 3px rgba(10, 132, 255, 0.25),
+                    0 0 20px rgba(10, 132, 255, 0.15);
+            }
+
+            .modal-actions {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                padding-top: 8px;
+            }
+
+            .btn-modal {
+                padding: 12px 24px;
+                font-weight: 600;
+                font-size: 15px;
+                font-family: inherit;
+                cursor: pointer;
+                border: none;
+                border-radius: var(--radius-md);
+            }
+
+            .btn-modal:active {
+                opacity: 0.8;
+            }
+
+            .btn-cancel {
+                background: rgba(255, 255, 255, 0.1);
+                color: var(--text-primary);
+            }
+
+            .btn-cancel:hover {
+                background: rgba(255, 255, 255, 0.18);
+                box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+            }
+
+            .btn-confirm {
+                background: var(--accent-blue);
+                color: #fff;
+            }
+
+            .btn-confirm:hover {
+                background: #0077ed;
+                box-shadow: 0 0 25px rgba(10, 132, 255, 0.5);
+            }
+
+            .modal-refresh-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                padding: 8px 12px;
+                background: rgba(10, 132, 255, 0.15);
+                border: none;
+                border-radius: var(--radius-sm);
+                color: var(--accent-blue);
+                font-size: 12px;
+                font-weight: 600;
+                cursor: pointer;
+                align-self: flex-start;
+            }
+
+            .modal-refresh-btn:hover {
+                background: rgba(10, 132, 255, 0.25);
+            }
+
+            .modal-refresh-btn svg {
+                width: 14px;
+                height: 14px;
+            }
+
+            /* ========================================== SCROLLBAR STYLES ========================================== */
+            ::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: rgba(255, 255, 255, 0.15);
+                border-radius: 4px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: rgba(255, 255, 255, 0.25);
+            }
+
+            ::selection {
+                background: rgba(10, 132, 255, 0.4);
+            }
+
+            /* ========================================== RESPONSIVE STYLES ========================================== */
+            @media (max-width: 900px) {
+                body {
+                    padding: 0;
+                }
+
+                /* Hide the grid-right on mobile */
+                #grid-right {
+                    display: none !important;
+                }
+
+                /* Make news ticker responsive */
+                #news-ticker {
+                    height: auto;
+                    min-height: 50px;
+                }
+
+                .ticker-icon {
+                    padding: 0 12px;
+                }
+
+                .ticker-icon .ticker-logo {
+                    width: 35px;
+                    height: 35px;
+                }
+
+                .ticker-icon .ticker-wave {
+                    width: 35px;
+                    height: 35px;
+                }
+
+                a.ticker-item {
+                    font-size: 34px;
+                    padding-right: 20px;
+                }
+
+                .ticker-loading {
+                    font-size: 14px;
+                }
+
+                /* Main container adjustments */
+                #main-container {
+                    flex-direction: column;
+                    overflow-y: auto;
+                }
+
+                /* Sidebar moves below the stream grid on narrow screens. */
+                #sidebar-left {
+                    width: 100%;
+                    height: auto;
+                    min-height: 700px;
+                    border-left: none;
+                    border-top: 2px solid #00fc93;
+                }
+
+                /* Main video frame responsive */
+                #main-video-frame {
+                    height: 200px;
+                    min-height: 200px;
+                }
+
+                #main-video-frame .stream-dropdown-wrapper {
+                    min-height: 200px;
+                }
+
+                /* Header row responsive */
+                .header-row {
+                    height: 48px;
+                }
+
+                .stream-title {
+                    font-size: 16px;
+                    letter-spacing: 0.3px;
+                }
+
+                .card-header {
+                    padding: 0 12px;
+                }
+
+                /* Viewer badge responsive */
+                .viewer-badge {
+                    min-width: 100px;
+                    padding: 0 12px;
+                }
+
+                .badge-content {
+                    font-size: 18px;
+                    min-width: 70px;
+                    gap: 6px;
+                }
+
+                .badge-content svg {
+                    width: 24px;
+                    height: 24px;
+                }
+
+                /* Close button responsive */
+                .close-btn {
+                    width: 40px;
+                    font-size: 16px;
+                }
+
+                /* Chat wrapper responsive */
+                #chat-wrapper {
+                    height: 300px;
+                    min-height: 300px;
+                }
+
+                /* Placeholder responsive */
+                .placeholder h1 {
+                    font-size: 28px;
+                }
+
+                .placeholder p {
+                    font-size: 11px;
+                }
+
+                /* Dropdown responsive */
+                .stream-dropdown-wrapper {
+                    padding: 12px;
+                }
+
+                .stream-dropdown {
+                    width: 95%;
+                    max-width: 100%;
+                }
+
+                .dropdown-title {
+                    font-size: 12px;
+                }
+
+                .dropdown-channel-name {
+                    font-size: 16px;
+                }
+
+                .dropdown-header {
+                    padding: 10px 12px;
+                }
+
+                .dropdown-header-text {
+                    font-size: 13px;
+                }
+
+                .dropdown-item {
+                    padding: 10px 12px;
+                    gap: 8px;
+                }
+
+                .dropdown-item-title {
+                    font-size: 12px;
+                }
+
+                .dropdown-item-viewers {
+                    font-size: 11px;
+                }
+
+                .dropdown-item-live,
+                .dropdown-item-upcoming {
+                    font-size: 9px;
+                    padding: 2px 6px;
+                }
+
+                .dropdown-item-time {
+                    font-size: 10px;
+                }
+
+                /* Modal responsive */
+                .modal-box {
+                    width: 95%;
+                    max-width: 95%;
+                    padding: 20px;
+                    margin: 10px;
+                }
+
+                .modal-title {
+                    font-size: 16px;
+                }
+
+                .modal-slot-info {
+                    font-size: 12px;
+                }
+
+                .modal-section-title {
+                    font-size: 12px;
+                }
+
+                .modal-input {
+                    padding: 12px 14px;
+                    font-size: 14px;
+                }
+
+                .btn-modal {
+                    padding: 10px 20px;
+                    font-size: 14px;
+                }
+
+                .modal-dropdown.open .dropdown-list {
+                    max-height: 180px;
+                }
+            }
+
+            /* Extra small devices (phones, less than 600px) */
+            @media (max-width: 600px) {
+                a.ticker-item {
+                    font-size: 28px;
+                }
+
+                .ticker-icon .ticker-logo {
+                    width: 30px;
+                    height: 30px;
+                }
+
+                .ticker-icon .ticker-wave {
+                    width: 30px;
+                    height: 30px;
+                }
+
+                .stream-title {
+                    font-size: 14px;
+                }
+
+                .badge-content {
+                    font-size: 16px;
+                    min-width: 60px;
+                }
+
+                .badge-content svg {
+                    width: 20px;
+                    height: 20px;
+                }
+
+                #main-video-frame {
+                    height: 180px;
+                    min-height: 255px;
+                }
+
+                #main-video-frame .stream-dropdown-wrapper {
+                    min-height: 255px;
+                }
+
+                #chat-wrapper {
+                    height: 250px;
+                    min-height: 250px;
+                }
+
+                .placeholder h1 {
+                    font-size: 24px;
+                }
+
+                .placeholder p {
+                    font-size: 10px;
+                }
+            }
+
+            /* Very small devices (less than 400px) */
+            @media (max-width: 400px) {
+                a.ticker-item {
+                    font-size: 14px;
+                }
+
+                .ticker-icon {
+                    padding: 0 8px;
+                }
+
+                .stream-title {
+                    font-size: 12px;
+                }
+
+                .badge-content {
+                    font-size: 14px;
+                    min-width: 50px;
+                }
+
+                .header-row {
+                    height: 44px;
+                }
+
+                .card-header {
+                    padding: 0 8px;
+                }
+
+                .viewer-badge {
+                    padding: 0 8px;
+                    min-width: 80px;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <!-- Modal Overlay -->
+        <div id="modal-overlay" aria-hidden="true">
+            <div class="modal-box" role="dialog" aria-modal="true" aria-label="Add Stream">
+                <div class="modal-title">Add Stream</div>
+                <div class="modal-slot-info" id="modal-slot-info">Slot 1</div>
+                <div class="modal-dropdown-wrapper">
+                    <div class="modal-section-title">Select Live Stream</div>
+                    <div class="modal-dropdown" id="modal-stream-dropdown">
+                        <div class="dropdown-header" onclick="window.app?.toggleModalDropdown()">
+                            <span class="dropdown-header-text" id="modal-dropdown-selected">
+                                Choose a live stream...
+                            </span>
+                            <svg class="dropdown-arrow" viewBox="0 0 24 24">
+                                <path d="M7 10l5 5 5-5z" fill="currentColor" />
+                            </svg>
+                        </div>
+                        <div class="dropdown-list" id="modal-dropdown-list">
+                            <div class="dropdown-loading">
+                                <div class="dropdown-loading-spinner"></div>
+                                <span>Fetching live streams...</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="modal-refresh-btn" onclick="window.app?.refreshModalDropdown()">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"
+                            />
+                        </svg>
+                        Refresh
+                    </button>
+                </div>
+                <div class="modal-divider">or</div>
+                <div class="modal-dropdown-wrapper">
+                    <div class="modal-section-title">Paste URL Manually</div>
+                    <input type="text" id="modal-url" class="modal-input" placeholder="Paste YouTube URL..." />
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-modal btn-cancel" onclick="window.app?.closeModal()">Cancel</button>
+                    <button class="btn-modal btn-confirm" onclick="window.app?.confirmModal()">Add</button>
+                </div>
+            </div>
+        </div>
+        <!-- Main Container -->
+        <div id="main-container">
+            <!-- Stream Grid (6 channels: 2 columns x 3 rows) -->
+            <main id="grid-right">
+                <!-- Stream Card 1 -->
+                <div class="stream-card">
+                    <div class="header-row">
+                        <div class="card-header" onclick="window.app?.openModal('1')">
+                            <span id="title-1" class="stream-title">Click to Add Stream</span>
+                        </div>
+                        <div id="badge-1" class="viewer-badge badge-1" aria-hidden="true">
+                            <div id="badge-content-1" class="badge-content">
+                                <span>—</span>
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                        <button id="close-1" class="close-btn" onclick="window.app?.closeStream('1')">
+                            <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 14 14"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                            >
+                                <path d="M1 1l12 12M13 1L1 13" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="video-container">
+                        <div class="placeholder" id="ph-1" onclick="window.app?.openModal('1')">
+                            <h1>1</h1>
+                            <p>Click to add stream</p>
+                        </div>
+                        <div
+                            id="player-1"
+                            style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%"
+                        ></div>
+                        <div id="dropdown-wrapper-1" class="stream-dropdown-wrapper">
+                            <div class="dropdown-title">Select Live Stream</div>
+                            <div class="dropdown-channel-name" id="dropdown-channel-1">Loading...</div>
+                            <div class="stream-dropdown" id="stream-dropdown-1">
+                                <div class="dropdown-header" onclick="window.app?.toggleDropdown('1')">
+                                    <span class="dropdown-header-text" id="dropdown-selected-1">
+                                        Choose a live stream...
+                                    </span>
+                                    <svg class="dropdown-arrow" viewBox="0 0 24 24">
+                                        <path d="M7 10l5 5 5-5z" fill="currentColor" />
+                                    </svg>
+                                </div>
+                                <div class="dropdown-list" id="dropdown-list-1">
+                                    <div class="dropdown-loading">
+                                        <div class="dropdown-loading-spinner"></div>
+                                        <span>Fetching live streams...</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dropdown-actions">
+                                <button
+                                    class="dropdown-btn dropdown-btn-refresh"
+                                    onclick="window.app?.refreshLiveStreams('1')"
+                                >
+                                    Refresh
+                                </button>
+                                <button class="dropdown-btn dropdown-btn-skip" onclick="window.app?.skipDropdown('1')">
+                                    Skip
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Stream Card 2 -->
+                <div class="stream-card">
+                    <div class="header-row">
+                        <div class="card-header" onclick="window.app?.openModal('2')">
+                            <span id="title-2" class="stream-title">Click to Add Stream</span>
+                        </div>
+                        <div id="badge-2" class="viewer-badge badge-2" aria-hidden="true">
+                            <div id="badge-content-2" class="badge-content">
+                                <span>—</span>
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                        <button id="close-2" class="close-btn" onclick="window.app?.closeStream('2')">
+                            <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 14 14"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                            >
+                                <path d="M1 1l12 12M13 1L1 13" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="video-container">
+                        <div class="placeholder" id="ph-2" onclick="window.app?.openModal('2')">
+                            <h1>2</h1>
+                            <p>Click to add stream</p>
+                        </div>
+                        <div
+                            id="player-2"
+                            style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%"
+                        ></div>
+                        <div id="dropdown-wrapper-2" class="stream-dropdown-wrapper">
+                            <div class="dropdown-title">Select Live Stream</div>
+                            <div class="dropdown-channel-name" id="dropdown-channel-2">Loading...</div>
+                            <div class="stream-dropdown" id="stream-dropdown-2">
+                                <div class="dropdown-header" onclick="window.app?.toggleDropdown('2')">
+                                    <span class="dropdown-header-text" id="dropdown-selected-2">
+                                        Choose a live stream...
+                                    </span>
+                                    <svg class="dropdown-arrow" viewBox="0 0 24 24">
+                                        <path d="M7 10l5 5 5-5z" fill="currentColor" />
+                                    </svg>
+                                </div>
+                                <div class="dropdown-list" id="dropdown-list-2">
+                                    <div class="dropdown-loading">
+                                        <div class="dropdown-loading-spinner"></div>
+                                        <span>Fetching live streams...</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dropdown-actions">
+                                <button
+                                    class="dropdown-btn dropdown-btn-refresh"
+                                    onclick="window.app?.refreshLiveStreams('2')"
+                                >
+                                    Refresh
+                                </button>
+                                <button class="dropdown-btn dropdown-btn-skip" onclick="window.app?.skipDropdown('2')">
+                                    Skip
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Stream Card 3 -->
+                <div class="stream-card">
+                    <div class="header-row">
+                        <div class="card-header" onclick="window.app?.openModal('3')">
+                            <span id="title-3" class="stream-title">Click to Add Stream</span>
+                        </div>
+                        <div id="badge-3" class="viewer-badge badge-3" aria-hidden="true">
+                            <div id="badge-content-3" class="badge-content">
+                                <span>—</span>
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                        <button id="close-3" class="close-btn" onclick="window.app?.closeStream('3')">
+                            <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 14 14"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                            >
+                                <path d="M1 1l12 12M13 1L1 13" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="video-container">
+                        <div class="placeholder" id="ph-3" onclick="window.app?.openModal('3')">
+                            <h1>3</h1>
+                            <p>Click to add stream</p>
+                        </div>
+                        <div
+                            id="player-3"
+                            style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%"
+                        ></div>
+                        <div id="dropdown-wrapper-3" class="stream-dropdown-wrapper">
+                            <div class="dropdown-title">Select Live Stream</div>
+                            <div class="dropdown-channel-name" id="dropdown-channel-3">Loading...</div>
+                            <div class="stream-dropdown" id="stream-dropdown-3">
+                                <div class="dropdown-header" onclick="window.app?.toggleDropdown('3')">
+                                    <span class="dropdown-header-text" id="dropdown-selected-3">
+                                        Choose a live stream...
+                                    </span>
+                                    <svg class="dropdown-arrow" viewBox="0 0 24 24">
+                                        <path d="M7 10l5 5 5-5z" fill="currentColor" />
+                                    </svg>
+                                </div>
+                                <div class="dropdown-list" id="dropdown-list-3">
+                                    <div class="dropdown-loading">
+                                        <div class="dropdown-loading-spinner"></div>
+                                        <span>Fetching live streams...</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dropdown-actions">
+                                <button
+                                    class="dropdown-btn dropdown-btn-refresh"
+                                    onclick="window.app?.refreshLiveStreams('3')"
+                                >
+                                    Refresh
+                                </button>
+                                <button class="dropdown-btn dropdown-btn-skip" onclick="window.app?.skipDropdown('3')">
+                                    Skip
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Stream Card 4 -->
+                <div class="stream-card">
+                    <div class="header-row">
+                        <div class="card-header" onclick="window.app?.openModal('4')">
+                            <span id="title-4" class="stream-title">Click to Add Stream</span>
+                        </div>
+                        <div id="badge-4" class="viewer-badge badge-4" aria-hidden="true">
+                            <div id="badge-content-4" class="badge-content">
+                                <span>—</span>
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                        <button id="close-4" class="close-btn" onclick="window.app?.closeStream('4')">
+                            <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 14 14"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                            >
+                                <path d="M1 1l12 12M13 1L1 13" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="video-container">
+                        <div class="placeholder" id="ph-4" onclick="window.app?.openModal('4')">
+                            <h1>4</h1>
+                            <p>Click to add stream</p>
+                        </div>
+                        <div
+                            id="player-4"
+                            style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%"
+                        ></div>
+                        <div id="dropdown-wrapper-4" class="stream-dropdown-wrapper">
+                            <div class="dropdown-title">Select Live Stream</div>
+                            <div class="dropdown-channel-name" id="dropdown-channel-4">Loading...</div>
+                            <div class="stream-dropdown" id="stream-dropdown-4">
+                                <div class="dropdown-header" onclick="window.app?.toggleDropdown('4')">
+                                    <span class="dropdown-header-text" id="dropdown-selected-4">
+                                        Choose a live stream...
+                                    </span>
+                                    <svg class="dropdown-arrow" viewBox="0 0 24 24">
+                                        <path d="M7 10l5 5 5-5z" fill="currentColor" />
+                                    </svg>
+                                </div>
+                                <div class="dropdown-list" id="dropdown-list-4">
+                                    <div class="dropdown-loading">
+                                        <div class="dropdown-loading-spinner"></div>
+                                        <span>Fetching live streams...</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dropdown-actions">
+                                <button
+                                    class="dropdown-btn dropdown-btn-refresh"
+                                    onclick="window.app?.refreshLiveStreams('4')"
+                                >
+                                    Refresh
+                                </button>
+                                <button class="dropdown-btn dropdown-btn-skip" onclick="window.app?.skipDropdown('4')">
+                                    Skip
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Stream Card 5 -->
+                <div class="stream-card">
+                    <div class="header-row">
+                        <div class="card-header" onclick="window.app?.openModal('5')">
+                            <span id="title-5" class="stream-title">Click to Add Stream</span>
+                        </div>
+                        <div id="badge-5" class="viewer-badge badge-5" aria-hidden="true">
+                            <div id="badge-content-5" class="badge-content">
+                                <span>—</span>
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                        <button id="close-5" class="close-btn" onclick="window.app?.closeStream('5')">
+                            <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 14 14"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                            >
+                                <path d="M1 1l12 12M13 1L1 13" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="video-container">
+                        <div class="placeholder" id="ph-5" onclick="window.app?.openModal('5')">
+                            <h1>5</h1>
+                            <p>Click to add stream</p>
+                        </div>
+                        <div
+                            id="player-5"
+                            style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%"
+                        ></div>
+                        <div id="dropdown-wrapper-5" class="stream-dropdown-wrapper">
+                            <div class="dropdown-title">Select Live Stream</div>
+                            <div class="dropdown-channel-name" id="dropdown-channel-5">Loading...</div>
+                            <div class="stream-dropdown" id="stream-dropdown-5">
+                                <div class="dropdown-header" onclick="window.app?.toggleDropdown('5')">
+                                    <span class="dropdown-header-text" id="dropdown-selected-5">
+                                        Choose a live stream...
+                                    </span>
+                                    <svg class="dropdown-arrow" viewBox="0 0 24 24">
+                                        <path d="M7 10l5 5 5-5z" fill="currentColor" />
+                                    </svg>
+                                </div>
+                                <div class="dropdown-list" id="dropdown-list-5">
+                                    <div class="dropdown-loading">
+                                        <div class="dropdown-loading-spinner"></div>
+                                        <span>Fetching live streams...</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dropdown-actions">
+                                <button
+                                    class="dropdown-btn dropdown-btn-refresh"
+                                    onclick="window.app?.refreshLiveStreams('5')"
+                                >
+                                    Refresh
+                                </button>
+                                <button class="dropdown-btn dropdown-btn-skip" onclick="window.app?.skipDropdown('5')">
+                                    Skip
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Stream Card 6 -->
+                <div class="stream-card">
+                    <div class="header-row">
+                        <div class="card-header" onclick="window.app?.openModal('6')">
+                            <span id="title-6" class="stream-title">Click to Add Stream</span>
+                        </div>
+                        <div id="badge-6" class="viewer-badge badge-6" aria-hidden="true">
+                            <div id="badge-content-6" class="badge-content">
+                                <span>—</span>
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                        <button id="close-6" class="close-btn" onclick="window.app?.closeStream('6')">
+                            <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 14 14"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                            >
+                                <path d="M1 1l12 12M13 1L1 13" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="video-container">
+                        <div class="placeholder" id="ph-6" onclick="window.app?.openModal('6')">
+                            <h1>6</h1>
+                            <p>Click to add stream</p>
+                        </div>
+                        <div
+                            id="player-6"
+                            style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%"
+                        ></div>
+                        <div id="dropdown-wrapper-6" class="stream-dropdown-wrapper">
+                            <div class="dropdown-title">Select Live Stream</div>
+                            <div class="dropdown-channel-name" id="dropdown-channel-6">Loading...</div>
+                            <div class="stream-dropdown" id="stream-dropdown-6">
+                                <div class="dropdown-header" onclick="window.app?.toggleDropdown('6')">
+                                    <span class="dropdown-header-text" id="dropdown-selected-6">
+                                        Choose a live stream...
+                                    </span>
+                                    <svg class="dropdown-arrow" viewBox="0 0 24 24">
+                                        <path d="M7 10l5 5 5-5z" fill="currentColor" />
+                                    </svg>
+                                </div>
+                                <div class="dropdown-list" id="dropdown-list-6">
+                                    <div class="dropdown-loading">
+                                        <div class="dropdown-loading-spinner"></div>
+                                        <span>Fetching live streams...</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dropdown-actions">
+                                <button
+                                    class="dropdown-btn dropdown-btn-refresh"
+                                    onclick="window.app?.refreshLiveStreams('6')"
+                                >
+                                    Refresh
+                                </button>
+                                <button class="dropdown-btn dropdown-btn-skip" onclick="window.app?.skipDropdown('6')">
+                                    Skip
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            <!-- Sidebar Left (Main Player + Chat) -->
+            <aside id="sidebar-left">
+                <div id="main-player-group">
+                    <div class="header-row">
+                        <div class="card-header" onclick="window.app?.openModal('main')">
+                            <span id="title-main" class="stream-title">Click to Add Stream</span>
+                        </div>
+                        <div id="badge-main" class="viewer-badge badge-main" aria-hidden="true">
+                            <div id="badge-content-main" class="badge-content">
+                                <span>—</span>
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                        <button id="close-main" class="close-btn" onclick="window.app?.closeStream('main')">
+                            <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 14 14"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                            >
+                                <path d="M1 1l12 12M13 1L1 13" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="main-video-frame">
+                        <div class="placeholder" id="ph-main" onclick="window.app?.openModal('main')">
+                            <h1>Main</h1>
+                            <p>Click to add stream</p>
+                        </div>
+                        <div
+                            id="player-main"
+                            style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%"
+                        ></div>
+                        <div id="dropdown-wrapper-main" class="stream-dropdown-wrapper">
+                            <div class="dropdown-title">Select Live Stream</div>
+                            <div class="dropdown-channel-name" id="dropdown-channel-main">Loading...</div>
+                            <div class="stream-dropdown" id="stream-dropdown-main">
+                                <div class="dropdown-header" onclick="window.app?.toggleDropdown('main')">
+                                    <span class="dropdown-header-text" id="dropdown-selected-main">
+                                        Choose a live stream...
+                                    </span>
+                                    <svg class="dropdown-arrow" viewBox="0 0 24 24">
+                                        <path d="M7 10l5 5 5-5z" fill="currentColor" />
+                                    </svg>
+                                </div>
+                                <div class="dropdown-list" id="dropdown-list-main">
+                                    <div class="dropdown-loading">
+                                        <div class="dropdown-loading-spinner"></div>
+                                        <span>Fetching live streams...</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dropdown-actions">
+                                <button
+                                    class="dropdown-btn dropdown-btn-refresh"
+                                    onclick="window.app?.refreshLiveStreams('main')"
+                                >
+                                    Refresh
+                                </button>
+                                <button
+                                    class="dropdown-btn dropdown-btn-skip"
+                                    onclick="window.app?.skipDropdown('main')"
+                                >
+                                    Skip
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="chat-wrapper">
+                    <div class="video-container">
+                        <div class="placeholder" id="ph-chat" style="display: flex">
+                            <h1>Chat</h1>
+                        </div>
+                        <iframe
+                            id="frame-chat"
+                            style="display: none"
+                            allow="autoplay; encrypted-media; fullscreen"
+                            allowfullscreen
+                        ></iframe>
+                    </div>
+                </div>
+            </aside>
+        </div>
+        <!-- News Ticker -->
+        <div id="news-ticker">
+            <div class="ticker-icon">
+                <svg class="ticker-wave wave-1" viewBox="0 0 57 33">
+                    <path
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M11.9927 8.466C11.9927 8.466 38.1996 8.53197 38.2986 8.466C40.7065 6.96516 51.1464 0.829872 51.2454 0.829872C51.2619 0.829872 51.2948 0.829872 51.3113 0.829872H56.3581L43.1804 32.3969H37.375L40.756 24.7278C34.1094 24.7278 17.1549 24.6783 17.0725 24.7278C14.6645 26.2287 4.22463 32.3639 4.12567 32.3639C3.39999 32.3969 0.381826 32.3639 0.381826 32.3639C0.381826 32.3639 -0.145941 32.3804 0.0189858 32.0176C0.695187 30.5168 3.1526 24.7443 3.1526 24.7278C3.1526 24.7278 3.3835 24.0516 4.20814 24.0516C7.07787 24.0516 16.8416 24.0516 16.858 24.0516C16.858 24.0516 28.3865 17.537 29.8048 16.7453C29.9038 16.6794 39.4036 16.7124 44.2854 16.7453L47.6335 9.1422C43.7082 9.1422 38.4965 9.1422 38.4965 9.1422C38.4965 9.1422 26.9681 15.6568 25.5497 16.4485C25.4013 16.5309 8.21587 16.4485 8.21587 16.4485C7.55616 16.4485 7.27578 15.9207 7.58914 15.261L10.228 9.65347C10.5413 8.99377 11.3165 8.466 11.9762 8.466H11.9927Z"
+                        fill="#09613c"
+                    />
+                </svg>
+                <svg class="ticker-wave wave-2" viewBox="0 0 57 33">
+                    <path
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M11.9927 8.466C11.9927 8.466 38.1996 8.53197 38.2986 8.466C40.7065 6.96516 51.1464 0.829872 51.2454 0.829872C51.2619 0.829872 51.2948 0.829872 51.3113 0.829872H56.3581L43.1804 32.3969H37.375L40.756 24.7278C34.1094 24.7278 17.1549 24.6783 17.0725 24.7278C14.6645 26.2287 4.22463 32.3639 4.12567 32.3639C3.39999 32.3969 0.381826 32.3639 0.381826 32.3639C0.381826 32.3639 -0.145941 32.3804 0.0189858 32.0176C0.695187 30.5168 3.1526 24.7443 3.1526 24.7278C3.1526 24.7278 3.3835 24.0516 4.20814 24.0516C7.07787 24.0516 16.8416 24.0516 16.858 24.0516C16.858 24.0516 28.3865 17.537 29.8048 16.7453C29.9038 16.6794 39.4036 16.7124 44.2854 16.7453L47.6335 9.1422C43.7082 9.1422 38.4965 9.1422 38.4965 9.1422C38.4965 9.1422 26.9681 15.6568 25.5497 16.4485C25.4013 16.5309 8.21587 16.4485 8.21587 16.4485C7.55616 16.4485 7.27578 15.9207 7.58914 15.261L10.228 9.65347C10.5413 8.99377 11.3165 8.466 11.9762 8.466H11.9927Z"
+                        fill="#09613c"
+                    />
+                </svg>
+                <svg class="ticker-wave wave-3" viewBox="0 0 57 33">
+                    <path
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M11.9927 8.466C11.9927 8.466 38.1996 8.53197 38.2986 8.466C40.7065 6.96516 51.1464 0.829872 51.2454 0.829872C51.2619 0.829872 51.2948 0.829872 51.3113 0.829872H56.3581L43.1804 32.3969H37.375L40.756 24.7278C34.1094 24.7278 17.1549 24.6783 17.0725 24.7278C14.6645 26.2287 4.22463 32.3639 4.12567 32.3639C3.39999 32.3969 0.381826 32.3639 0.381826 32.3639C0.381826 32.3639 -0.145941 32.3804 0.0189858 32.0176C0.695187 30.5168 3.1526 24.7443 3.1526 24.7278C3.1526 24.7278 3.3835 24.0516 4.20814 24.0516C7.07787 24.0516 16.8416 24.0516 16.858 24.0516C16.858 24.0516 28.3865 17.537 29.8048 16.7453C29.9038 16.6794 39.4036 16.7124 44.2854 16.7453L47.6335 9.1422C43.7082 9.1422 38.4965 9.1422 38.4965 9.1422C38.4965 9.1422 26.9681 15.6568 25.5497 16.4485C25.4013 16.5309 8.21587 16.4485 8.21587 16.4485C7.55616 16.4485 7.27578 15.9207 7.58914 15.261L10.228 9.65347C10.5413 8.99377 11.3165 8.466 11.9762 8.466H11.9927Z"
+                        fill="#09613c"
+                    />
+                </svg>
+                <svg class="ticker-wave wave-4" viewBox="0 0 57 33">
+                    <path
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M11.9927 8.466C11.9927 8.466 38.1996 8.53197 38.2986 8.466C40.7065 6.96516 51.1464 0.829872 51.2454 0.829872C51.2619 0.829872 51.2948 0.829872 51.3113 0.829872H56.3581L43.1804 32.3969H37.375L40.756 24.7278C34.1094 24.7278 17.1549 24.6783 17.0725 24.7278C14.6645 26.2287 4.22463 32.3639 4.12567 32.3639C3.39999 32.3969 0.381826 32.3639 0.381826 32.3639C0.381826 32.3639 -0.145941 32.3804 0.0189858 32.0176C0.695187 30.5168 3.1526 24.7443 3.1526 24.7278C3.1526 24.7278 3.3835 24.0516 4.20814 24.0516C7.07787 24.0516 16.8416 24.0516 16.858 24.0516C16.858 24.0516 28.3865 17.537 29.8048 16.7453C29.9038 16.6794 39.4036 16.7124 44.2854 16.7453L47.6335 9.1422C43.7082 9.1422 38.4965 9.1422 38.4965 9.1422C38.4965 9.1422 26.9681 15.6568 25.5497 16.4485C25.4013 16.5309 8.21587 16.4485 8.21587 16.4485C7.55616 16.4485 7.27578 15.9207 7.58914 15.261L10.228 9.65347C10.5413 8.99377 11.3165 8.466 11.9762 8.466H11.9927Z"
+                        fill="#09613c"
+                    />
+                </svg>
+                <svg class="ticker-logo" viewBox="0 0 57 33">
+                    <path
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M11.9927 8.466C11.9927 8.466 38.1996 8.53197 38.2986 8.466C40.7065 6.96516 51.1464 0.829872 51.2454 0.829872C51.2619 0.829872 51.2948 0.829872 51.3113 0.829872H56.3581L43.1804 32.3969H37.375L40.756 24.7278C34.1094 24.7278 17.1549 24.6783 17.0725 24.7278C14.6645 26.2287 4.22463 32.3639 4.12567 32.3639C3.39999 32.3969 0.381826 32.3639 0.381826 32.3639C0.381826 32.3639 -0.145941 32.3804 0.0189858 32.0176C0.695187 30.5168 3.1526 24.7443 3.1526 24.7278C3.1526 24.7278 3.3835 24.0516 4.20814 24.0516C7.07787 24.0516 16.8416 24.0516 16.858 24.0516C16.858 24.0516 28.3865 17.537 29.8048 16.7453C29.9038 16.6794 39.4036 16.7124 44.2854 16.7453L47.6335 9.1422C43.7082 9.1422 38.4965 9.1422 38.4965 9.1422C38.4965 9.1422 26.9681 15.6568 25.5497 16.4485C25.4013 16.5309 8.21587 16.4485 8.21587 16.4485C7.55616 16.4485 7.27578 15.9207 7.58914 15.261L10.228 9.65347C10.5413 8.99377 11.3165 8.466 11.9762 8.466H11.9927Z"
+                        fill="#00FC93"
+                    />
+                </svg>
+            </div>
+            <div class="ticker-content" id="ticker-content">
+                <span class="ticker-loading">Loading headlines...</span>
+            </div>
+        </div>
+        <script src="https://www.youtube.com/iframe_api"></script>
+<script>
+            // =============================================
+            // =============================================
+// =============================================
+            // ATHLETIKO SERVER-SIDE FETCH
+            // The browser no longer uses public CORS proxies.
+            // The Cloudflare Worker fetches Athletiko server-side.
+            // =============================================
+            const ATHLETIKO_WORKER_URL = "https://athletiko-scraper.melissiamcr.workers.dev/";
+            const YOUTUBE_WAITING_WORKER_URL = ATHLETIKO_WORKER_URL;
+
+// =============================================
+            // YOUTUBE DATA API v3
+            // IMPORTANT: Restrict this API key in Google Cloud Console
+            // by HTTP referrer and enable only YouTube Data API v3.
+            // =============================================
+            const YOUTUBE_API_KEY = "AIzaSyCCDxpGMm9ttK8E2Rv2O475631mbWMlFGk";
+            const YOUTUBE_API_BASE = "https://www.googleapis.com/youtube/v3";
+            const YOUTUBE_API_TIMEOUT = 12000;
+            const YOUTUBE_STREAM_CACHE_MS = 60000;
+
+            // =============================================
+            // TICKER CODE
+            // =============================================
+            let tickerTitles = [],
+                tickerLinks = [],
+                currentTickerIndex = 0,
+                tickerTimeout = null,
+                lastFetchTime = 0,
+                isFetchingTicker = false;
+
+            const DISPLAY_DURATION = 6000,
+                HOLD_BEFORE_SCROLL = 1500,
+                HOLD_AFTER_SCROLL = 2500,
+                MIN_SCROLL_DURATION = 3000,
+                BASE_URL = "https://www.athletiko.gr/latest-news",
+                MIN_WORD_COUNT = 3,
+                TICKER_FETCH_INTERVAL = 30000,
+                TICKER_FETCH_TIMEOUT = 15000,
+                FLASH_DURATION = 800;
+
+            let ytApiReadyGlobal = false;
+
+            function onYouTubeIframeAPIReady() {
+                ytApiReadyGlobal = true;
+                if (window.app) {
+                    window.app.ytApiReady = true;
+                    window.app.onYTApiReady();
+                }
+            }
+
+            function checkYTApi() {
+                if (window.YT && window.YT.Player && typeof window.YT.Player === "function") {
+                    ytApiReadyGlobal = true;
+                    return true;
+                }
+                return false;
+            }
+
+            function countWords(s) {
+                return s
+                    ? s
+                          .trim()
+                          .split(/\s+/)
+                          .filter((w) => w.length > 0).length
+                    : 0;
+            }
+
+            function triggerTickerFlash() {
+                const ticker = document.getElementById("news-ticker");
+                if (!ticker) return;
+                ticker.classList.remove("flash");
+                void ticker.offsetWidth;
+                ticker.classList.add("flash");
+                setTimeout(() => ticker.classList.remove("flash"), FLASH_DURATION);
+            }
+
+            async function fetchNewsTicker() {
+                if (isFetchingTicker) return;
+                isFetchingTicker = true;
+
+                try {
+                    const controller = new AbortController();
+                    const timeout = setTimeout(() => controller.abort(), TICKER_FETCH_TIMEOUT);
+
+                    // Fetch Athletiko through the Cloudflare Worker.
+                    // No public browser CORS proxy is needed anymore.
+                    const response = await fetch(`${ATHLETIKO_WORKER_URL}?_t=${Date.now()}`, {
+                        signal: controller.signal,
+                        cache: "no-store",
+                        headers: { "Accept": "text/html,application/xhtml+xml" },
+                    });
+
+                    clearTimeout(timeout);
+
+                    if (!response.ok) {
+                        throw new Error(`Athletiko Worker HTTP ${response.status}`);
+                    }
+
+                    const html = await response.text();
+                    if (!html || html.length < 500) {
+                        throw new Error("Athletiko Worker returned an empty/incomplete page");
+                    }
+
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, "text/html");
+                    const titles = [];
+                    const links = [];
+                    const seen = new Set();
+
+                    const addArticle = (anchor, heading) => {
+                        if (!heading) return;
+                        const tx = heading.textContent?.replace(/\s+/g, " ").trim();
+                        if (!tx || tx.length <= 5 || tx.length >= 200 || countWords(tx) < MIN_WORD_COUNT) return;
+
+                        const rh = anchor?.getAttribute("href") || heading.closest("a")?.getAttribute("href") || "";
+                        if (!rh) return;
+
+                        let hr;
+                        try {
+                            hr = new URL(rh, "https://www.athletiko.gr/").href;
+                        } catch (e) {
+                            return;
+                        }
+
+                        // Only keep real Athletiko article links.
+                        if (!/^https?:\/\/(www\.)?athletiko\.gr\//i.test(hr)) return;
+                        if (seen.has(tx)) return;
+
+                        seen.add(tx);
+                        titles.push(tx);
+                        links.push(hr);
+                    };
+
+                    // Current Athletiko markup: article titles are H2 elements inside links.
+                    doc.querySelectorAll("a[href] h2").forEach((h2) => addArticle(h2.closest("a"), h2));
+
+                    // Fallbacks for markup changes.
+                    if (titles.length === 0) {
+                        doc.querySelectorAll("article h2, article h3, h2, h3").forEach((heading) => {
+                            const anchor = heading.closest("a") || heading.parentElement?.querySelector("a[href]");
+                            addArticle(anchor, heading);
+                        });
+                    }
+
+                    if (titles.length === 0) {
+                        doc.querySelectorAll('a[href*="/news/"], a[href*="/article/"], a[href*="/sports/"]').forEach((a) => {
+                            const heading = a.querySelector("h1, h2, h3, h4") || a;
+                            addArticle(a, heading);
+                        });
+                    }
+
+                    if (titles.length === 0) {
+                        throw new Error("No Athletiko article titles found in Worker response");
+                    }
+
+                    lastFetchTime = Date.now();
+
+                    // Only rebuild the ticker when the actual article list changed.
+                    const hasChanged =
+                        titles.length !== tickerTitles.length ||
+                        titles.some((title, i) => title !== tickerTitles[i] || links[i] !== tickerLinks[i]);
+
+                    if (hasChanged) {
+                        tickerTitles = titles;
+                        tickerLinks = links;
+                        triggerTickerFlash();
+                        initTicker();
+                    }
+                } catch (e) {
+                    console.warn("Ticker fetch failed:", e.message);
+                    // Keep existing headlines on a temporary network failure.
+                    // Only show a fallback if the ticker has never loaded successfully.
+                    if (tickerTitles.length === 0) {
+                        tickerTitles = ["Sports News", "Live Coverage", "Breaking Stories"];
+                        tickerLinks = [
+                            "https://www.athletiko.gr/",
+                            "https://www.athletiko.gr/",
+                            "https://www.athletiko.gr/",
+                        ];
+                        initTicker();
+                    }
+                } finally {
+                    isFetchingTicker = false;
+                }
+            }
+
+            function initTicker() {
+                const c = document.getElementById("ticker-content");
+                if (!c || tickerTitles.length === 0) return;
+                c.innerHTML = "";
+                c.classList.remove("has-overflow");
+                tickerTitles.forEach((t, i) => {
+                    const it = document.createElement("a");
+                    it.className = "ticker-item";
+                    it.id = `ticker-item-${i}`;
+                    it.href = tickerLinks[i];
+                    it.target = "_blank";
+                    it.rel = "noopener noreferrer";
+                    it.textContent = t;
+                    c.appendChild(it);
+                });
+                showTickerItem(0);
+            }
+
+            function showTickerItem(i) {
+                if (tickerTimeout) clearTimeout(tickerTimeout);
+                const c = document.getElementById("ticker-content");
+                if (!c) return;
+                c.classList.remove("has-overflow");
+                document.querySelectorAll(".ticker-item").forEach((it) => {
+                    it.classList.remove("active", "exiting", "scrolling");
+                    it.style.transform = "translateX(30px)";
+                    it.style.transition = "opacity 0.25s ease, transform 0.25s ease";
+                });
+                currentTickerIndex = i;
+                const it = document.getElementById(`ticker-item-${i}`);
+                if (it && c) {
+                    const cw = c.clientWidth - 48;
+                    const iw = it.scrollWidth;
+                    const ov = iw - cw;
+                    if (ov > 0) c.classList.add("has-overflow");
+                    it.style.transform = "translateX(0)";
+                    it.classList.add("active");
+                    setTimeout(() => {
+                        if (ov > 0) handleLongText(it, ov);
+                        else tickerTimeout = setTimeout(transitionToNext, DISPLAY_DURATION);
+                    }, 50);
+                }
+            }
+
+            function handleLongText(it, ov) {
+                tickerTimeout = setTimeout(() => {
+                    const sd = ov + 30;
+                    const dur = Math.max(MIN_SCROLL_DURATION, (sd / 80) * 1000);
+                    it.classList.add("scrolling");
+                    it.style.transition = `transform ${dur}ms ease-in-out`;
+                    it.style.transform = `translateX(-${sd}px)`;
+                    tickerTimeout = setTimeout(() => {
+                        tickerTimeout = setTimeout(transitionToNext, HOLD_AFTER_SCROLL);
+                    }, dur);
+                }, HOLD_BEFORE_SCROLL);
+            }
+
+            function transitionToNext() {
+                const c = document.getElementById("ticker-content");
+                const ci = document.getElementById(`ticker-item-${currentTickerIndex}`);
+                if (ci) {
+                    ci.classList.remove("active", "scrolling");
+                    ci.classList.add("exiting");
+                }
+                if (c) c.classList.remove("has-overflow");
+                const ni = (currentTickerIndex + 1) % tickerTitles.length;
+                setTimeout(() => showTickerItem(ni), 250);
+            }
+
+            fetchNewsTicker();
+            setInterval(fetchNewsTicker, TICKER_FETCH_INTERVAL);
+            document.addEventListener("visibilitychange", () => {
+                if (!document.hidden && Date.now() - lastFetchTime > 15000) fetchNewsTicker();
+            });
+
+            // =============================================
+            // STREAM APP CLASS
+            // =============================================
+            class StreamApp {
+                constructor() {
+                    this.modal = document.getElementById("modal-overlay");
+                    this.inputUrl = document.getElementById("modal-url");
+                    this.activeSlot = null;
+                    this.slotStates = {};
+                    this.players = {};
+                    this.ytApiReady = false;
+                    this.pendingLoads = [];
+                    this.currentUnmutedSlot = null;
+                    this.muteCheckInterval = null;
+                    this.TARGET_QUALITY = "hd720";
+                    this.MIN_INTERVAL_MS = 4000;
+                    this.UPCOMING_WAITING_INTERVAL_MS = 12000;
+                    this.FETCH_TIMEOUT = 12000;
+                    this.STREAM_END_CONFIRM_COUNT = 2;
+
+
+                    this.userIconSVG =
+                        '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
+                    this.previousViewerCounts = {};
+                    this.lastKnownViewerCounts = {};
+                    this.MILESTONE_THRESHOLD = 1000;
+                    this.autoLoadDone = {};
+                    this.closedSlots = {};
+
+                    this.channelConfigs = {
+                        1: {
+                            channelHandle: "@sport24greecetv",
+                            channelName: "SPORT24",
+                        },
+                        2: {
+                            channelHandle: "@gazzetta_gr",
+                            channelName: "Gazzetta.gr",
+                        },
+                        3: {
+                            channelHandle: "@Betarades_gr",
+                            channelName: "BETARADES",
+                        },
+                        4: {
+                            channelHandle: "@Foxbet_Gr",
+                            channelName: "Foxbet.gr",
+                        },
+
+                        // ADD / EDIT YOUTUBE CHANNELS HERE
+                        // Each numbered channel becomes one player in the 2-column stream grid.
+                        5: {
+                            channelHandle: "@ProtoThemaEidiseis",
+                            channelName: "PROTOTHEMA.GR",
+                        },
+                        6: {
+                            channelHandle: "@novibet",
+                            channelName: "NOVIBET",
+                        },
+
+                        main: {
+                            channelHandle: "@athletikogr",
+                            channelName: "Athletiko",
+                        },
+                    };
+
+                    this.liveStreamsCache = {};
+                    this.cacheTimestamps = {};
+                    this.channelIdCache = {};
+                    this.modalLiveStreams = [];
+
+                    console.log("🚀 StreamApp initialized");
+
+                    this._loadSavedViewerCounts();
+                    this.initLiveStreamDropdowns();
+                    this.initYTApiCheck();
+                    this._startBadgeProtection();
+                }
+
+                _loadSavedViewerCounts() {
+                    try {
+                        const saved = localStorage.getItem("streamViewerCounts");
+                        if (saved) {
+                            this.lastKnownViewerCounts = JSON.parse(saved) || {};
+                        }
+                    } catch (e) {
+                        this.lastKnownViewerCounts = {};
+                    }
+                }
+
+                _saveViewerCounts() {
+                    try {
+                        localStorage.setItem("streamViewerCounts", JSON.stringify(this.lastKnownViewerCounts));
+                    } catch (e) {}
+                }
+
+                _startBadgeProtection() {
+                    setInterval(() => {
+                        Object.keys(this.slotStates).forEach((slot) => {
+                            const st = this.slotStates[slot];
+                            if (st && st.vidId && st.realtimeActive && st.wasLive && !st.isUpcoming && !this.closedSlots[slot]) {
+                                const bc = document.getElementById(`badge-content-${slot}`);
+                                if (bc) {
+                                    const spanEl = bc.querySelector("span");
+                                    const currentText = spanEl ? spanEl.textContent.trim() : "";
+                                    if (!currentText || currentText === "—") {
+                                        const lastKnown = this.lastKnownViewerCounts[slot];
+                                        if (lastKnown && /\d/.test(lastKnown)) {
+                                            bc.innerHTML = `${this.userIconSVG}<span>${this._escapeHtml(lastKnown)}</span>`;
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }, 2000);
+                }
+
+                _formatDateTime(timestamp, timeStr) {
+                    if (!timestamp) return timeStr || "";
+                    const date = new Date(timestamp);
+                    const day = date.getDate().toString().padStart(2, "0");
+                    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+                    const hours = date.getHours().toString().padStart(2, "0");
+                    const minutes = date.getMinutes().toString().padStart(2, "0");
+                    return `${day}/${month} ${timeStr || `${hours}:${minutes}`}`;
+                }
+
+                async autoLoadBestStream(slot) {
+                    if (this.autoLoadDone[slot] || this.closedSlots[slot]) return;
+                    this.autoLoadDone[slot] = true;
+                    const cache = this.liveStreamsCache[slot];
+                    if (!cache) return;
+                    const { live, upcoming } = cache;
+                    let bestStream = null;
+                    if (live && live.length > 0) {
+                        bestStream = live[0];
+                    } else if (upcoming && upcoming.length > 0) {
+                        bestStream = upcoming[0];
+                    }
+                    if (bestStream) {
+                        this.hideDropdown(slot);
+                        const url = `https://www.youtube.com/watch?v=${bestStream.videoId}`;
+                        this.loadVideo(slot, bestStream.videoId, url, bestStream);
+                        this.fetchChannelName(url, slot);
+                    }
+                }
+
+                _extractStreamFromRenderer(renderer) {
+                    if (!renderer) return null;
+                    const videoId = renderer.videoId;
+                    if (!videoId || videoId.length !== 11) return null;
+
+                    let title = renderer.title?.runs?.[0]?.text || renderer.title?.simpleText || "Untitled";
+                    let isLive = false,
+                        isUpcoming = false,
+                        viewers = null,
+                        scheduledTime = null,
+                        scheduledTimestamp = null;
+
+                    const badges = renderer.badges || [];
+                    for (const b of badges) {
+                        const mr = b?.metadataBadgeRenderer;
+                        if (mr) {
+                            const label = (mr.label || "").toLowerCase();
+                            if (label.includes("live")) isLive = true;
+                        }
+                        if (b?.liveBadge) isLive = true;
+                    }
+
+                    const overlays = renderer.thumbnailOverlays || [];
+                    for (const ov of overlays) {
+                        const sr = ov?.thumbnailOverlayTimeStatusRenderer;
+                        if (sr) {
+                            const style = (sr.style || "").toUpperCase();
+                            if (style === "LIVE") isLive = true;
+                            if (style === "UPCOMING") isUpcoming = true;
+                        }
+                    }
+
+                    const vct =
+                        renderer.viewCountText?.runs?.map((r) => r.text).join("") ||
+                        renderer.viewCountText?.simpleText ||
+                        "";
+                    if (vct) {
+                        const lower = vct.toLowerCase();
+                        if (lower.includes("watching") || lower.includes("παρακολουθ")) {
+                            isLive = true;
+                            const m = vct.match(/([\d,.\s]+)/);
+                            if (m) viewers = m[1].trim();
+                        }
+                        if (lower.includes("waiting") || lower.includes("scheduled")) {
+                            isUpcoming = true;
+                            isLive = false;
+                        }
+                    }
+
+                    const ued = renderer.upcomingEventData;
+                    if (ued) {
+                        isUpcoming = true;
+                        isLive = false;
+                        if (ued.startTime) {
+                            const ts = parseInt(ued.startTime) * 1000;
+                            scheduledTimestamp = ts;
+                            const sd = new Date(ts);
+                            scheduledTime =
+                                sd.getHours().toString().padStart(2, "0") +
+                                ":" +
+                                sd.getMinutes().toString().padStart(2, "0");
+                        }
+                    }
+                    
+                    // ========================= FIX START =========================
+                    // This is the critical fix. YouTube sometimes sends a "live" badge
+                    // for an upcoming stream (e.g., a premiere). This logic ensures
+                    // that if a stream is marked as both, we prioritize 'upcoming' status
+                    // to ensure it appears in the dropdown list before it begins.
+                    if (isLive && isUpcoming) {
+                        isLive = false;
+                    }
+                    // ========================== FIX END ==========================
+
+                    if (!isLive && !isUpcoming) return null;
+
+                    return { videoId, title, isLive, isUpcoming, viewers, scheduledTime, scheduledTimestamp };
+                }
+
+
+                async _youtubeApiRequest(endpoint, params = {}) {
+                    const query = new URLSearchParams({
+                        ...params,
+                        key: YOUTUBE_API_KEY,
+                    });
+
+                    const controller = new AbortController();
+                    const timeout = setTimeout(() => controller.abort(), YOUTUBE_API_TIMEOUT);
+
+                    try {
+                        const response = await fetch(`${YOUTUBE_API_BASE}/${endpoint}?${query.toString()}`, {
+                            signal: controller.signal,
+                            cache: "no-store",
+                        });
+
+                        if (!response.ok) {
+                            let message = `YouTube API HTTP ${response.status}`;
+                            try {
+                                const err = await response.json();
+                                const apiMessage = err?.error?.message;
+                                if (apiMessage) message += `: ${apiMessage}`;
+                            } catch (e) {}
+                            throw new Error(message);
+                        }
+
+                        return await response.json();
+                    } finally {
+                        clearTimeout(timeout);
+                    }
+                }
+
+                async _getChannelId(cfg) {
+                    if (!cfg?.channelHandle) return null;
+
+                    const cacheKey = cfg.channelHandle.toLowerCase();
+                    if (this.channelIdCache[cacheKey]) return this.channelIdCache[cacheKey];
+
+                    const handle = cfg.channelHandle.startsWith("@")
+                        ? cfg.channelHandle
+                        : `@${cfg.channelHandle}`;
+
+                    const data = await this._youtubeApiRequest("channels", {
+                        part: "contentDetails,snippet",
+                        forHandle: handle,
+                    });
+
+                    const item = data?.items?.[0];
+                    if (!item?.id) throw new Error(`Channel not found: ${handle}`);
+
+                    this.channelIdCache[cacheKey] = item.id;
+                    return item.id;
+                }
+
+                async _fetchAllStreamsForChannel(cfg) {
+                    if (!cfg?.channelHandle) return { live: [], upcoming: [] };
+
+                    const cacheKey = cfg.channelHandle;
+                    const now = Date.now();
+
+                    if (
+                        this.cacheTimestamps[cacheKey] &&
+                        now - this.cacheTimestamps[cacheKey] < YOUTUBE_STREAM_CACHE_MS
+                    ) {
+                        return this.liveStreamsCache[cacheKey] || { live: [], upcoming: [] };
+                    }
+
+                    console.log(`🔄 Fetching ${cfg.channelName} from YouTube Data API...`);
+
+                    try {
+                        const channelId = await this._getChannelId(cfg);
+                        if (!channelId) return { live: [], upcoming: [] };
+
+                        // Read the channel's uploads playlist instead of scraping YouTube HTML.
+                        // The latest 50 uploads are enough to locate the channel's current
+                        // live/upcoming broadcasts in normal operation.
+                        const channelData = await this._youtubeApiRequest("channels", {
+                            part: "contentDetails",
+                            id: channelId,
+                        });
+
+                        const uploadsPlaylistId =
+                            channelData?.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
+
+                        if (!uploadsPlaylistId) {
+                            throw new Error(`Uploads playlist not found for ${cfg.channelName}`);
+                        }
+
+                        const playlistData = await this._youtubeApiRequest("playlistItems", {
+                            part: "contentDetails",
+                            playlistId: uploadsPlaylistId,
+                            maxResults: "50",
+                        });
+
+                        const ids = (playlistData?.items || [])
+                            .map((item) => item?.contentDetails?.videoId)
+                            .filter((id) => /^[A-Za-z0-9_-]{11}$/.test(id));
+
+                        if (!ids.length) {
+                            this.liveStreamsCache[cacheKey] = { live: [], upcoming: [] };
+                            this.cacheTimestamps[cacheKey] = now;
+                            return { live: [], upcoming: [] };
+                        }
+
+                        const videoData = await this._youtubeApiRequest("videos", {
+                            part: "snippet,liveStreamingDetails",
+                            id: ids.join(","),
+                            maxResults: "50",
+                        });
+
+                        const live = [];
+                        const upcoming = [];
+
+                        for (const video of videoData?.items || []) {
+                            const snippet = video?.snippet || {};
+                            const liveDetails = video?.liveStreamingDetails || {};
+                            const broadcastStatus = snippet.liveBroadcastContent;
+
+                            const stream = {
+                                videoId: video.id,
+                                title: snippet.title || "Live Stream",
+                                isLive: broadcastStatus === "live",
+                                isUpcoming: broadcastStatus === "upcoming",
+                                viewers:
+                                    liveDetails.concurrentViewers != null
+                                        ? String(liveDetails.concurrentViewers)
+                                        : null,
+                                scheduledTime: null,
+                                scheduledTimestamp: null,
+                            };
+
+                            if (liveDetails.scheduledStartTime) {
+                                const ts = new Date(liveDetails.scheduledStartTime).getTime();
+                                if (!Number.isNaN(ts)) {
+                                    stream.scheduledTimestamp = ts;
+                                    const d = new Date(ts);
+                                    stream.scheduledTime =
+                                        d.getHours().toString().padStart(2, "0") +
+                                        ":" +
+                                        d.getMinutes().toString().padStart(2, "0");
+                                }
+                            }
+
+                            if (stream.isLive) {
+                                live.push(stream);
+                            } else if (stream.isUpcoming) {
+                                upcoming.push(stream);
+                            }
+                        }
+
+                        // Live first; upcoming streams sorted by scheduled start time.
+                        live.sort((a, b) => (Number(b.viewers) || 0) - (Number(a.viewers) || 0));
+                        upcoming.sort(
+                            (a, b) =>
+                                (a.scheduledTimestamp || Number.MAX_SAFE_INTEGER) -
+                                (b.scheduledTimestamp || Number.MAX_SAFE_INTEGER)
+                        );
+
+                        const result = { live, upcoming };
+                        this.liveStreamsCache[cacheKey] = result;
+                        this.cacheTimestamps[cacheKey] = now;
+
+                        console.log(
+                            `📺 ${cfg.channelName}: ${live.length} live, ${upcoming.length} upcoming`
+                        );
+
+                        return result;
+                    } catch (e) {
+                        console.warn(`YouTube API failed for ${cfg.channelName}:`, e.message);
+                        throw e;
+                    }
+                }
+
+                initYTApiCheck() {
+                    if (checkYTApi() || ytApiReadyGlobal) {
+                        this.ytApiReady = true;
+                        this.onYTApiReady();
+                        return;
+                    }
+                    let attempts = 0;
+                    const poll = setInterval(() => {
+                        attempts++;
+                        if (checkYTApi() || ytApiReadyGlobal) {
+                            clearInterval(poll);
+                            this.ytApiReady = true;
+                            this.onYTApiReady();
+                        } else if (attempts >= 50) {
+                            clearInterval(poll);
+                        }
+                    }, 100);
+                }
+
+                onYTApiReady() {
+                    this.pendingLoads.forEach((i) => this.createYTPlayer(i.slot, i.vidId));
+                    this.pendingLoads = [];
+                    this.startMutePolling();
+                }
+
+                createYTPlayer(slot, vidId) {
+                    const ct = document.getElementById(`player-${slot}`)?.parentElement;
+                    if (!ct || !window.YT?.Player) {
+                        this.pendingLoads.push({ slot, vidId });
+                        return;
+                    }
+
+                    if (this.players[slot]) {
+                        try {
+                            this.players[slot].destroy();
+                        } catch (e) {}
+                        delete this.players[slot];
+                    }
+
+                    const od = document.getElementById(`player-${slot}`);
+                    if (od) od.remove();
+
+                    const nd = document.createElement("div");
+                    nd.id = `player-${slot}`;
+                    nd.style.cssText = "display:block;position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;";
+                    ct.appendChild(nd);
+
+                    const ph = document.getElementById(`ph-${slot}`);
+                    if (ph) ph.style.display = "none";
+
+                    this.players[slot] = new YT.Player(`player-${slot}`, {
+                        videoId: vidId,
+                        host: "https://www.youtube-nocookie.com",
+                        playerVars: {
+                            autoplay: 1,
+                            mute: 1,
+                            controls: 1,
+                            enablejsapi: 1,
+                            fs: 1,
+                            iv_load_policy: 3,
+                            modestbranding: 1,
+                            playsinline: 1,
+                            rel: 0,
+                            showinfo: 0,
+                            origin: window.location.origin,
+                        },
+                        events: {
+                            onReady: (e) => {
+                                e.target.playVideo();
+                                const playerEl = document.getElementById(`player-${slot}`);
+                                if (playerEl) playerEl.style.opacity = "1";
+                            },
+                            onStateChange: (e) => {
+                                // A scheduled/upcoming broadcast can report ENDED in
+                                // the embedded player before its scheduled start. Do not
+                                // treat that as a finished live stream.
+                                if (e.data === YT.PlayerState.ENDED) {
+                                    const st = this.slotStates[slot];
+                                    if (st?.wasLive) this._handleStreamEnded(slot);
+                                }
+                            },
+                            onError: (e) => {
+                                const st = this.slotStates[slot];
+                                if (st?.wasLive && [100, 101, 150].includes(e.data)) {
+                                    this._handleStreamEnded(slot);
+                                }
+                            },
+                        },
+                    });
+                }
+
+                startMutePolling() {
+                    if (!this.muteCheckInterval) {
+                        this.muteCheckInterval = setInterval(() => {
+                            const um = Object.keys(this.players).filter((s) => {
+                                try {
+                                    return !this.players[s]?.isMuted?.();
+                                } catch (e) {
+                                    return false;
+                                }
+                            });
+                            if (um.length > 1) {
+                                const keep = um.find((s) => s !== this.currentUnmutedSlot) || um[0];
+                                um.forEach((s) => {
+                                    if (s !== keep) this.players[s]?.mute();
+                                });
+                                this.currentUnmutedSlot = keep;
+                            } else {
+                                this.currentUnmutedSlot = um[0] || null;
+                            }
+                        }, 250);
+                    }
+                }
+
+                buildChatUrl(vidId) {
+                    return `https://www.youtube.com/live_chat?v=${vidId}&embed_domain=${window.location.hostname || "localhost"}&dark_theme=1`;
+                }
+
+                openModal(slotId) {
+                    this.activeSlot = slotId;
+                    if (this.modal) {
+                        this.modal.style.display = "flex";
+                        requestAnimationFrame(() => this.modal.classList.add("active"));
+                    }
+                    if (this.inputUrl) {
+                        this.inputUrl.value = "";
+                        setTimeout(() => this.inputUrl.focus(), 100);
+                    }
+                    const si = document.getElementById("modal-slot-info");
+                    if (si) si.textContent = slotId === "main" ? "Main Player" : `Slot ${slotId}`;
+                    this.resetModalDropdown();
+                    this.fetchModalLiveStreams(slotId);
+                }
+
+                closeModal() {
+                    if (this.modal) {
+                        this.modal.classList.remove("active");
+                        setTimeout(() => (this.modal.style.display = "none"), 150);
+                    }
+                    this.activeSlot = null;
+                }
+
+                confirmModal() {
+                    if (!this.activeSlot) return;
+                    const url = (this.inputUrl?.value || "").trim();
+                    const vid = this.getId(url);
+                    if (!vid) {
+                        alert("Invalid YouTube URL");
+                        return;
+                    }
+                    const slot = this.activeSlot;
+                    this.hideDropdown(slot);
+                    this.closeModal();
+                    delete this.closedSlots[slot];
+                    this.loadVideo(slot, vid, url);
+                    this.fetchChannelName(url, slot);
+                }
+
+                resetModalDropdown() {
+                    const dd = document.getElementById("modal-stream-dropdown");
+                    const ht = document.getElementById("modal-dropdown-selected");
+                    const dl = document.getElementById("modal-dropdown-list");
+                    if (dd) dd.classList.remove("open");
+                    if (ht) ht.textContent = "Choose a live stream...";
+                    if (dl)
+                        dl.innerHTML =
+                            '<div class="dropdown-loading"><div class="dropdown-loading-spinner"></div><span>Fetching...</span></div>';
+                }
+
+                toggleModalDropdown() {
+                    const dd = document.getElementById("modal-stream-dropdown");
+                    if (dd) dd.classList.toggle("open");
+                }
+
+                refreshModalDropdown() {
+                    if (this.activeSlot) {
+                        this.resetModalDropdown();
+                        this.fetchModalLiveStreams(this.activeSlot);
+                    }
+                }
+
+                async fetchModalLiveStreams(slot) {
+                    const cfg = this.channelConfigs[slot];
+                    if (!cfg) return;
+                    try {
+                        const { live, upcoming } = await this._fetchAllStreamsForChannel(cfg);
+                        this.populateModalDropdown(live, upcoming);
+                    } catch (e) {
+                        this.showModalDropdownError("Failed to load");
+                    }
+                }
+
+                populateModalDropdown(live, upcoming) {
+                    const dl = document.getElementById("modal-dropdown-list");
+                    if (!dl) return;
+                    dl.innerHTML = "";
+
+                    if (!live.length && !upcoming.length) {
+                        dl.innerHTML = '<div class="dropdown-error">No streams found</div>';
+                        return;
+                    }
+
+                    if (live.length) {
+                        const hdr = document.createElement("div");
+                        hdr.className = "dropdown-section-header";
+                        hdr.textContent = "🔴 Live Now";
+                        dl.appendChild(hdr);
+                        live.forEach((s) => {
+                            const it = document.createElement("div");
+                            it.className = "dropdown-item";
+                            it.onclick = () => this.selectModalStream(s);
+                            it.innerHTML = `<div class="dropdown-item-live">LIVE</div><span class="dropdown-item-title">${this._escapeHtml(s.title)}</span>${s.viewers ? `<span class="dropdown-item-viewers">${s.viewers}</span>` : ""}`;
+                            dl.appendChild(it);
+                        });
+                    }
+
+                    if (upcoming.length) {
+                        const hdr = document.createElement("div");
+                        hdr.className = "dropdown-section-header";
+                        hdr.textContent = "📅 Upcoming";
+                        dl.appendChild(hdr);
+                        upcoming.forEach((s) => {
+                            const it = document.createElement("div");
+                            it.className = "dropdown-item upcoming-item";
+                            it.onclick = () => this.selectModalStream(s);
+                            const time = this._formatDateTime(s.scheduledTimestamp, s.scheduledTime);
+                            it.innerHTML = `<div class="dropdown-item-upcoming">SOON</div><span class="dropdown-item-title">${this._escapeHtml(s.title)}</span>${time ? `<span class="dropdown-item-time">${time}</span>` : ""}`;
+                            dl.appendChild(it);
+                        });
+                    }
+                }
+
+                showModalDropdownError(msg) {
+                    const dl = document.getElementById("modal-dropdown-list");
+                    if (dl)
+                        dl.innerHTML = `<div class="dropdown-error">${msg}<div class="dropdown-error-retry" onclick="window.app?.refreshModalDropdown()">Retry</div></div>`;
+                }
+
+                selectModalStream(stream) {
+                    const ht = document.getElementById("modal-dropdown-selected");
+                    if (ht) ht.textContent = stream.title;
+                    const dd = document.getElementById("modal-stream-dropdown");
+                    if (dd) dd.classList.remove("open");
+
+                    const slot = this.activeSlot;
+                    this.hideDropdown(slot);
+                    this.closeModal();
+                    delete this.closedSlots[slot];
+
+                    const url = `https://www.youtube.com/watch?v=${stream.videoId}`;
+                    this.loadVideo(slot, stream.videoId, url, stream);
+                    this.fetchChannelName(url, slot);
+                }
+
+                loadVideo(slot, vidId, originalUrl = null, streamMeta = null) {
+                    if (!slot || !vidId) {
+                        console.error("loadVideo: Missing slot or vidId", { slot, vidId });
+                        return;
+                    }
+
+                    console.log(`📺 Loading video ${vidId} in slot ${slot}`);
+
+                    this._stopRealtimeLoop(slot);
+                    delete this.closedSlots[slot];
+
+                    const te = document.getElementById(`title-${slot}`);
+                    if (te) {
+                        te.innerText = "Connecting...";
+                        te.style.color = "var(--accent-blue)";
+                    }
+
+                    const bd = document.getElementById(`badge-${slot}`);
+                    const bc = document.getElementById(`badge-content-${slot}`);
+                    if (bd) {
+                        bd.style.display = "flex";
+                        bd.style.visibility = "visible";
+                    }
+                    if (bc) bc.innerHTML = `${this.userIconSVG}<span></span>`;
+
+                    if (this.ytApiReady && window.YT?.Player) {
+                        this.createYTPlayer(slot, vidId);
+                    } else {
+                        this.pendingLoads.push({ slot, vidId });
+                    }
+
+                    if (slot === "main") {
+                        const cf = document.getElementById("frame-chat");
+                        const cp = document.getElementById("ph-chat");
+                        if (cf && cp) {
+                            cp.style.display = "none";
+                            cf.style.display = "block";
+                            cf.src = this.buildChatUrl(vidId);
+                        }
+                    }
+
+                    this._ensureSlotState(slot);
+                    this.slotStates[slot].vidId = vidId;
+                    this.slotStates[slot].originalUrl = originalUrl;
+                    // Keep the real broadcast state. An upcoming broadcast must NOT
+                    // be treated as a finished live broadcast, otherwise the player
+                    // can immediately advance through the upcoming queue.
+                    this.slotStates[slot].wasLive = streamMeta
+                        ? !!streamMeta.isLive
+                        : true;
+                    this.slotStates[slot].isUpcoming = streamMeta
+                        ? !!streamMeta.isUpcoming
+                        : false;
+                    this.slotStates[slot].notLiveCount = 0;
+                    this.slotStates[slot].consecutiveFailures = 0;
+                    this.slotStates[slot].waitingFetchAt = 0;
+                    this.slotStates[slot].waitingFetchInFlight = false;
+
+                    // Never carry a previous stream's viewer count into a new stream.
+                    delete this.lastKnownViewerCounts[slot];
+                    delete this.previousViewerCounts[slot];
+                    if (this.highestMilestones) delete this.highestMilestones[slot];
+                    this._saveViewerCounts();
+
+                    // Upcoming streams start with an empty badge. If YouTube exposes a
+                    // waiting/concurrent viewer count for the scheduled broadcast,
+                    // _fetchAndUpdate() will populate it; otherwise we leave it blank
+                    // rather than showing the previous stream's count.
+                    if (streamMeta?.isUpcoming && !streamMeta?.viewers) {
+                        if (bc) bc.innerHTML = `${this.userIconSVG}<span></span>`;
+                    }
+
+                    const cb = document.getElementById(`close-${slot}`);
+                    if (cb) cb.style.display = "flex";
+
+                    this._startRealtimeLoop(slot);
+                }
+
+                async _handleStreamEnded(slot) {
+                    const st = this.slotStates[slot];
+                    // Only a broadcast that was actually LIVE can be considered
+                    // finished. Upcoming broadcasts must remain on screen until they
+                    // transition to LIVE.
+                    if (!st || !st.wasLive || st.handlingEnd) return;
+                    st.handlingEnd = true;
+
+                    const cfg = this.channelConfigs[slot];
+                    if (!cfg) {
+                        this.closeStream(slot, false);
+                        return;
+                    }
+
+                    const te = document.getElementById(`title-${slot}`);
+                    if (te) te.innerText = "Checking for next stream...";
+
+                    try {
+                        delete this.liveStreamsCache[cfg.channelHandle];
+                        delete this.cacheTimestamps[cfg.channelHandle];
+
+                        const { live, upcoming } = await this._fetchAllStreamsForChannel(cfg);
+                        const currentVidId = st.vidId;
+
+                        // After a LIVE stream finishes, automatically move to another
+                        // stream that is LIVE right now. If there is no other live stream,
+                        // load ONLY the closest upcoming stream. Never step through the
+                        // rest of the upcoming queue.
+                        const nextLive = live.find((s) => s.videoId !== currentVidId);
+                        const nextStream = nextLive || upcoming.find((s) => s.videoId !== currentVidId);
+
+                        if (nextStream) {
+                            st.handlingEnd = false;
+                            this.loadVideo(
+                                slot,
+                                nextStream.videoId,
+                                `https://www.youtube.com/watch?v=${nextStream.videoId}`,
+                                nextStream
+                            );
+                            this.fetchChannelName(`https://www.youtube.com/watch?v=${nextStream.videoId}`, slot);
+                        } else {
+                            this.closeStream(slot, false);
+                        }
+                    } catch (e) {
+                        this.closeStream(slot, false);
+                    }
+                }
+
+                closeStream(slot, isManualClose = true) {
+                    if (!slot) return;
+
+                    this._stopRealtimeLoop(slot);
+                    this._clearViewerBadge(slot);
+                    delete this.slotStates[slot];
+                    delete this.lastKnownViewerCounts[slot];
+                    this._saveViewerCounts();
+
+                    if (isManualClose) this.closedSlots[slot] = true;
+
+                    const te = document.getElementById(`title-${slot}`);
+                    if (te) {
+                        te.innerText = "Click to Add Stream";
+                        te.style.color = "";
+                    }
+
+                    if (this.players[slot]) {
+                        try {
+                            this.players[slot].stopVideo();
+                            this.players[slot].destroy();
+                        } catch (e) {}
+                        delete this.players[slot];
+                    }
+
+                    this.pendingLoads = this.pendingLoads.filter((p) => p.slot !== slot);
+
+                    const ct = document.getElementById(`player-${slot}`)?.parentElement;
+                    if (ct) {
+                        const od = document.getElementById(`player-${slot}`);
+                        if (od) od.remove();
+                        const nd = document.createElement("div");
+                        nd.id = `player-${slot}`;
+                        nd.style.cssText = "display:none;position:absolute;top:0;left:0;width:100%;height:100%;";
+                        ct.appendChild(nd);
+                    }
+
+                    const ph = document.getElementById(`ph-${slot}`);
+                    if (ph) ph.style.display = "flex";
+
+                    const bd = document.getElementById(`badge-${slot}`);
+                    if (bd) {
+                        bd.style.display = "none";
+                        bd.style.visibility = "hidden";
+                    }
+
+                    const bc = document.getElementById(`badge-content-${slot}`);
+                    if (bc) bc.innerHTML = "";
+
+                    const cb = document.getElementById(`close-${slot}`);
+                    if (cb) cb.style.display = "none";
+
+                    if (slot === "main") {
+                        const cf = document.getElementById("frame-chat");
+                        const cp = document.getElementById("ph-chat");
+                        if (cf) {
+                            cf.style.display = "none";
+                            cf.src = "";
+                        }
+                        if (cp) cp.style.display = "flex";
+                    }
+
+                    if (this.currentUnmutedSlot === slot) this.currentUnmutedSlot = null;
+                    if (this.channelConfigs[slot]) setTimeout(() => this.showDropdownWithoutAutoLoad(slot), 300);
+                }
+
+                showDropdownWithoutAutoLoad(slot) {
+                    const wr = document.getElementById(`dropdown-wrapper-${slot}`);
+                    if (wr) wr.classList.remove("hidden");
+                    const ht = document.getElementById(`dropdown-selected-${slot}`);
+                    if (ht) ht.textContent = "Choose a live stream...";
+                    const dd = document.getElementById(`stream-dropdown-${slot}`);
+                    if (dd) dd.classList.remove("open");
+                    this.fetchLiveStreamsWithoutAutoLoad(slot);
+                }
+
+                async fetchLiveStreamsWithoutAutoLoad(slot) {
+                    const cfg = this.channelConfigs[slot];
+                    if (!cfg) return;
+                    const dl = document.getElementById(`dropdown-list-${slot}`);
+                    const dc = document.getElementById(`dropdown-channel-${slot}`);
+                    if (!dl) return;
+
+                    dl.innerHTML =
+                        '<div class="dropdown-loading"><div class="dropdown-loading-spinner"></div><span>Fetching...</span></div>';
+                    if (dc) dc.textContent = cfg.channelName;
+
+                    try {
+                        delete this.liveStreamsCache[cfg.channelHandle];
+                        delete this.cacheTimestamps[cfg.channelHandle];
+
+                        const { live, upcoming } = await this._fetchAllStreamsForChannel(cfg);
+                        this.liveStreamsCache[slot] = { live, upcoming };
+                        if (live.length || upcoming.length) this.populateDropdown(slot, live, upcoming);
+                        else this.showDropdownError(slot, "No streams found");
+                    } catch (e) {
+                        this.showDropdownError(slot, "Failed to load");
+                    }
+                }
+
+                async fetchChannelName(videoUrl, slot) {
+                    try {
+                        const r = await fetch(`https://noembed.com/embed?url=${encodeURIComponent(videoUrl)}`);
+                        const d = await r.json();
+                        const te = document.getElementById(`title-${slot}`);
+                        if (te) {
+                            te.innerText = d.author_name || "YouTube Channel";
+                            te.style.color = d.author_name ? "var(--text-primary)" : "var(--text-secondary)";
+                        }
+                    } catch (e) {
+                        const te = document.getElementById(`title-${slot}`);
+                        if (te) {
+                            te.innerText = "Connected";
+                            te.style.color = "var(--text-secondary)";
+                        }
+                    }
+                }
+
+                _ensureSlotState(slot) {
+                    if (!this.slotStates[slot]) {
+                        this.slotStates[slot] = {
+                            vidId: null,
+                            timerId: null,
+                            fetching: false,
+                            realtimeActive: false,
+                            originalUrl: null,
+                            consecutiveFailures: 0,
+                            wasLive: false,
+                            isUpcoming: false,
+                            waitingFetchAt: 0,
+                            waitingFetchInFlight: false,
+                            notLiveCount: 0,
+                            handlingEnd: false,
+                        };
+                    }
+                }
+
+                _startRealtimeLoop(slot) {
+                    this._ensureSlotState(slot);
+                    this.slotStates[slot].realtimeActive = true;
+                    this.slotStates[slot].consecutiveFailures = 0;
+                    this.slotStates[slot].handlingEnd = false;
+                    this._fetchAndUpdate(slot).finally(() => this._scheduleNextFetch(slot));
+                }
+
+                _stopRealtimeLoop(slot) {
+                    const st = this.slotStates[slot];
+                    if (st) {
+                        st.realtimeActive = false;
+                        if (st.timerId) {
+                            clearTimeout(st.timerId);
+                            st.timerId = null;
+                        }
+                    }
+                }
+
+                _scheduleNextFetch(slot) {
+                    const st = this.slotStates[slot];
+                    if (!st?.realtimeActive) return;
+                    if (st.timerId) clearTimeout(st.timerId);
+
+                    const baseInterval = st.isUpcoming ? this.UPCOMING_WAITING_INTERVAL_MS : this.MIN_INTERVAL_MS;
+                    const interval = Math.min(baseInterval * Math.pow(1.5, st.consecutiveFailures || 0), 30000);
+
+                    st.timerId = setTimeout(async () => {
+                        if (st.realtimeActive) {
+                            await this._fetchAndUpdate(slot);
+                            this._scheduleNextFetch(slot);
+                        }
+                    }, interval);
+                }
+
+                async _fetchUpcomingWaitingCount(videoId) {
+                    if (!videoId) return null;
+
+                    try {
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), this.FETCH_TIMEOUT);
+                        const response = await fetch(
+                            `${YOUTUBE_WAITING_WORKER_URL}?youtube=${encodeURIComponent(videoId)}&_t=${Date.now()}`,
+                            {
+                                method: "GET",
+                                cache: "no-store",
+                                signal: controller.signal,
+                                headers: { Accept: "application/json" },
+                            }
+                        );
+                        clearTimeout(timeoutId);
+
+                        if (!response.ok) return null;
+                        const data = await response.json();
+                        const n = this._parseNumber(data?.waitingViewers);
+                        return n !== null && n >= 0 ? n : null;
+                    } catch (e) {
+                        console.warn("Upcoming waiting-count request failed:", e.message);
+                        return null;
+                    }
+                }
+
+                async _fetchAndUpdate(slot) {
+                    const st = this.slotStates[slot];
+                    if (!st?.vidId || st.fetching || st.handlingEnd) return;
+                    st.fetching = true;
+
+                    try {
+                        // YouTube Data API v3 gives the authoritative LIVE viewer count
+                        // through videos.list -> liveStreamingDetails.concurrentViewers.
+                        const data = await this._youtubeApiRequest("videos", {
+                            part: "snippet,liveStreamingDetails",
+                            id: st.vidId,
+                        });
+
+                        const video = data?.items?.[0];
+
+                        if (!video) {
+                            st.consecutiveFailures++;
+                            return;
+                        }
+
+                        const snippet = video.snippet || {};
+                        const liveDetails = video.liveStreamingDetails || {};
+                        const broadcastState = snippet.liveBroadcastContent || "none";
+                        const isCurrentlyLive = broadcastState === "live";
+                        const isCurrentlyUpcoming = broadcastState === "upcoming";
+
+                        if (isCurrentlyLive) {
+                            st.notLiveCount = 0;
+                            st.wasLive = true;
+                            st.isUpcoming = false;
+                        } else if (st.wasLive) {
+                            st.notLiveCount++;
+                            if (st.notLiveCount >= this.STREAM_END_CONFIRM_COUNT) {
+                                st.fetching = false;
+                                this._clearViewerBadge(slot);
+                                this._handleStreamEnded(slot);
+                                return;
+                            }
+                        } else if (isCurrentlyUpcoming) {
+                            // Stay on the closest upcoming stream. Do not advance through
+                            // the upcoming queue. Its waiting count is NOT provided by the
+                            // Data API, so retrieve that number through the Worker.
+                            st.isUpcoming = true;
+                            st.notLiveCount = 0;
+
+                            const now = Date.now();
+                            if (!st.waitingFetchAt || now - st.waitingFetchAt >= this.UPCOMING_WAITING_INTERVAL_MS) {
+                                if (!st.waitingFetchInFlight) {
+                                    st.waitingFetchInFlight = true;
+                                    st.waitingFetchAt = now;
+
+                                    const waiting = await this._fetchUpcomingWaitingCount(st.vidId);
+                                    st.waitingFetchInFlight = false;
+
+                                    // Do not let an old count survive if the Worker cannot
+                                    // find a current waiting count.
+                                    if (waiting !== null) {
+                                        this._updateBadgeText(slot, this._formatNumber(waiting));
+                                    } else {
+                                        this._clearViewerBadge(slot);
+                                    }
+                                }
+                            }
+
+                            st.consecutiveFailures = 0;
+                            return;
+                        }
+
+                        // Once the broadcast is LIVE, always use the Data API count.
+                        const concurrentViewers = liveDetails.concurrentViewers;
+                        const n = this._parseNumber(concurrentViewers);
+
+                        if (n !== null && n >= 0 && isCurrentlyLive) {
+                            this._updateBadgeText(slot, this._formatNumber(n));
+                            st.consecutiveFailures = 0;
+                        } else if (isCurrentlyLive) {
+                            this._clearViewerBadge(slot);
+                            st.consecutiveFailures++;
+                        } else {
+                            st.consecutiveFailures++;
+                        }
+                    } catch (e) {
+                        console.warn(`Live count API update failed for ${slot}:`, e.message);
+                        st.consecutiveFailures++;
+                    } finally {
+                        st.fetching = false;
+                        if (st.waitingFetchInFlight && !st.isUpcoming) st.waitingFetchInFlight = false;
+                    }
+                }
+
+                _clearViewerBadge(slot) {
+                    const bc = document.getElementById(`badge-content-${slot}`);
+                    if (bc) bc.innerHTML = `${this.userIconSVG}<span></span>`;
+
+                    delete this.lastKnownViewerCounts[slot];
+                    delete this.previousViewerCounts[slot];
+                    if (this.highestMilestones) delete this.highestMilestones[slot];
+                    this._saveViewerCounts();
+                }
+
+                _updateBadgeText(slot, numText) {
+                    const textStr = String(numText || "").trim();
+                    if (!textStr || !/\d/.test(textStr)) return;
+
+                    // --- BADGE MILESTONE ANIMATION LOGIC ---
+                    if (slot === "main") {
+                        const currentCount = parseInt(textStr.replace(/[^\d]/g, ""), 10);
+                        const prevCount = this.previousViewerCounts[slot];
+
+                        if (prevCount !== undefined) {
+                            const currentMilestone = Math.floor(currentCount / this.MILESTONE_THRESHOLD);
+                            const prevMilestone = Math.floor(prevCount / this.MILESTONE_THRESHOLD);
+
+                            if (!this.highestMilestones) this.highestMilestones = {};
+                            const highest = this.highestMilestones[slot] || prevMilestone;
+
+                            if (currentMilestone > highest && currentMilestone >= 1) {
+                                this.triggerBadgeMilestoneAnimation(slot);
+                                this.highestMilestones[slot] = currentMilestone;
+                            } else {
+                                // Prevent bounce triggers if viewers fluctuate closely around a milestone
+                                this.highestMilestones[slot] = Math.max(highest, currentMilestone);
+                            }
+                        }
+                        this.previousViewerCounts[slot] = currentCount;
+                    }
+                    // ----------------------------------------
+
+                    const c = document.getElementById(`badge-content-${slot}`);
+                    if (!c) return;
+
+                    const badge = document.getElementById(`badge-${slot}`);
+                    if (badge?.style.display === "none") badge.style.display = "flex";
+
+                    this.lastKnownViewerCounts[slot] = textStr;
+                    this._saveViewerCounts();
+                    c.innerHTML = `${this.userIconSVG}<span>${this._escapeHtml(textStr)}</span>`;
+                }
+
+                // --- CATCHY "RGB STROBE / JACKPOT" BADGE ANIMATION ---
+                triggerBadgeMilestoneAnimation(slot) {
+                    const badge = document.getElementById(`badge-${slot}`);
+                    if (!badge) return;
+
+                    // Extremely visible animation: scales up and violently flashes Backgrounds/Text/Glows
+                    badge.animate(
+                        [
+                            { transform: "scale(1)" },
+                            {
+                                transform: "scale(1.3)",
+                                background: "#FFD700",
+                                color: "#000000",
+                                boxShadow: "0 0 20px #FFD700, 0 0 40px #FFD700",
+                                offset: 0.1,
+                            },
+                            {
+                                transform: "scale(1.1)",
+                                background: "#FF003C",
+                                color: "#FFFFFF",
+                                boxShadow: "0 0 20px #FF003C, 0 0 40px #FF003C",
+                                offset: 0.3,
+                            },
+                            {
+                                transform: "scale(1.4)",
+                                background: "#00FFCC",
+                                color: "#000000",
+                                boxShadow: "0 0 20px #00FFCC, 0 0 40px #00FFCC",
+                                offset: 0.5,
+                            },
+                            {
+                                transform: "scale(1.2)",
+                                background: "#FF00FF",
+                                color: "#FFFFFF",
+                                boxShadow: "0 0 20px #FF00FF, 0 0 40px #FF00FF",
+                                offset: 0.7,
+                            },
+                            {
+                                transform: "scale(1.3)",
+                                background: "#FFD700",
+                                color: "#000000",
+                                boxShadow: "0 0 20px #FFD700, 0 0 40px #FFD700",
+                                offset: 0.9,
+                            },
+                            { transform: "scale(1)", offset: 1 }, // Returns seamlessly to underlying CSS styles
+                        ],
+                        {
+                            duration: 2000, // Exactly 2 seconds
+                            iterations: 1,
+                            easing: "ease-in-out",
+                        }
+                    );
+                }
+                // -----------------------------------------------------
+
+                _escapeHtml(s) {
+                    return String(s).replace(
+                        /[&<>"']/g,
+                        (m) =>
+                            ({
+                                "&": "&amp;",
+                                "<": "&lt;",
+                                ">": "&gt;",
+                                '"': "&quot;",
+                                "'": "&#39;",
+                            })[m]
+                    );
+                }
+
+
+                _parseNumber(s) {
+                    if (!s) return null;
+                    const m = String(s).match(/([\d.,\s]+)/);
+                    if (!m) return null;
+                    const d = m[1].replace(/[^\d]/g, "");
+                    return d ? parseInt(d, 10) : null;
+                }
+
+                _formatNumber(n) {
+                    return String(Number(n) || 0).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                }
+
+                getId(url) {
+                    if (!url) return null;
+                    url = url.trim();
+                    if (/^[A-Za-z0-9_-]{11}$/.test(url)) return url;
+                    const m = url.match(
+                        /(?:youtube\.com\/watch\?.*v=|youtu\.be\/|youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/
+                    );
+                    if (m) return m[1];
+                    try {
+                        const parsed = new URL(url);
+                        const v = parsed.searchParams.get("v");
+                        if (v && v.length === 11) return v;
+                    } catch (e) {}
+                    return null;
+                }
+
+                initLiveStreamDropdowns() {
+                    Object.keys(this.channelConfigs).forEach((s) => this.fetchLiveStreams(s));
+                }
+
+                async fetchLiveStreams(slot) {
+                    const cfg = this.channelConfigs[slot];
+                    if (!cfg) return;
+
+                    const dl = document.getElementById(`dropdown-list-${slot}`);
+                    const dc = document.getElementById(`dropdown-channel-${slot}`);
+                    if (!dl) return;
+
+                    dl.innerHTML =
+                        '<div class="dropdown-loading"><div class="dropdown-loading-spinner"></div><span>Fetching...</span></div>';
+                    if (dc) dc.textContent = cfg.channelName;
+
+                    try {
+                        const { live, upcoming } = await this._fetchAllStreamsForChannel(cfg);
+                        this.liveStreamsCache[slot] = { live, upcoming };
+
+                        if (live.length || upcoming.length) {
+                            this.populateDropdown(slot, live, upcoming);
+                            if (!this.autoLoadDone[slot] && !this.closedSlots[slot]) {
+                                this.autoLoadBestStream(slot);
+                            }
+                        } else {
+                            this.showDropdownError(slot, "No streams found");
+                        }
+                    } catch (e) {
+                        this.showDropdownError(slot, "Failed to load");
+                    }
+                }
+
+                populateDropdown(slot, live, upcoming) {
+                    const dl = document.getElementById(`dropdown-list-${slot}`);
+                    if (!dl) return;
+                    dl.innerHTML = "";
+
+                    if (live.length) {
+                        const hdr = document.createElement("div");
+                        hdr.className = "dropdown-section-header";
+                        hdr.textContent = "🔴 Live Now";
+                        dl.appendChild(hdr);
+                        live.forEach((s) => {
+                            const it = document.createElement("div");
+                            it.className = "dropdown-item";
+                            it.onclick = () => this.selectStream(slot, s);
+                            it.innerHTML = `<div class="dropdown-item-live">LIVE</div><span class="dropdown-item-title">${this._escapeHtml(s.title)}</span>${s.viewers ? `<span class="dropdown-item-viewers">${s.viewers}</span>` : ""}`;
+                            dl.appendChild(it);
+                        });
+                    }
+
+                    if (upcoming.length) {
+                        const hdr = document.createElement("div");
+                        hdr.className = "dropdown-section-header";
+                        hdr.textContent = "📅 Upcoming";
+                        dl.appendChild(hdr);
+                        upcoming.forEach((s) => {
+                            const it = document.createElement("div");
+                            it.className = "dropdown-item upcoming-item";
+                            it.onclick = () => this.selectStream(slot, s);
+                            const time = this._formatDateTime(s.scheduledTimestamp, s.scheduledTime);
+                            it.innerHTML = `<div class="dropdown-item-upcoming">SOON</div><span class="dropdown-item-title">${this._escapeHtml(s.title)}</span>${time ? `<span class="dropdown-item-time">${time}</span>` : ""}`;
+                            dl.appendChild(it);
+                        });
+                    }
+                }
+
+                showDropdownError(slot, msg) {
+                    const dl = document.getElementById(`dropdown-list-${slot}`);
+                    if (dl)
+                        dl.innerHTML = `<div class="dropdown-error"><div>${msg}</div><div class="dropdown-error-retry" onclick="window.app?.refreshLiveStreams('${slot}')">Retry</div></div>`;
+                }
+
+                toggleDropdown(slot) {
+                    const dd = document.getElementById(`stream-dropdown-${slot}`);
+                    if (dd) dd.classList.toggle("open");
+                }
+
+                selectStream(slot, stream) {
+                    console.log(`📺 Selected stream: ${stream.title} for slot ${slot}`);
+
+                    const ht = document.getElementById(`dropdown-selected-${slot}`);
+                    if (ht) ht.textContent = stream.title;
+
+                    const dd = document.getElementById(`stream-dropdown-${slot}`);
+                    if (dd) dd.classList.remove("open");
+
+                    this.hideDropdown(slot);
+                    delete this.closedSlots[slot];
+
+                    const url = `https://www.youtube.com/watch?v=${stream.videoId}`;
+                    this.loadVideo(slot, stream.videoId, url, stream);
+                    this.fetchChannelName(url, slot);
+                }
+
+                skipDropdown(slot) {
+                    this.hideDropdown(slot);
+                }
+
+                hideDropdown(slot) {
+                    const wr = document.getElementById(`dropdown-wrapper-${slot}`);
+                    if (wr) wr.classList.add("hidden");
+                }
+
+                refreshLiveStreams(slot) {
+                    const cfg = this.channelConfigs[slot];
+                    if (cfg) {
+                        delete this.liveStreamsCache[cfg.channelHandle];
+                        delete this.cacheTimestamps[cfg.channelHandle];
+                    }
+
+                    const wr = document.getElementById(`dropdown-wrapper-${slot}`);
+                    if (wr) wr.classList.remove("hidden");
+
+                    const ht = document.getElementById(`dropdown-selected-${slot}`);
+                    if (ht) ht.textContent = "Choose a live stream...";
+
+                    const dd = document.getElementById(`stream-dropdown-${slot}`);
+                    if (dd) dd.classList.remove("open");
+
+                    this.fetchLiveStreamsWithoutAutoLoad(slot);
+                }
+
+                showDropdown(slot) {
+                    const wr = document.getElementById(`dropdown-wrapper-${slot}`);
+                    if (wr) wr.classList.remove("hidden");
+
+                    const ht = document.getElementById(`dropdown-selected-${slot}`);
+                    if (ht) ht.textContent = "Choose a live stream...";
+
+                    this.fetchLiveStreams(slot);
+                }
+            }
+
+            // Initialize
+            const app = new StreamApp();
+            window.app = app;
+
+            window.addEventListener("beforeunload", () => {
+                if (app.muteCheckInterval) clearInterval(app.muteCheckInterval);
+                Object.values(app.slotStates).forEach((st) => {
+                    if (st.timerId) clearTimeout(st.timerId);
+                });
+            });
+
+            document.getElementById("modal-url")?.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") window.app?.confirmModal();
+            });
+
+            window.addEventListener("keydown", (e) => {
+                if (e.key === "Escape") window.app?.closeModal();
+            });
+        </script>
+    </body>
+</html>
